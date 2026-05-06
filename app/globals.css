@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-royal: #2b5ba6;
+  --color-navy: #1e3a5f;
+  --color-silver: #c0c5ce;
+  --color-charcoal: #2d3436;
+  --color-medium-gray: #95a5a6;
+  --color-ink: #0a0a0a;
+  --color-bone: #f5f5f5;
+}
+
+html,
+body {
+  background-color: var(--color-ink);
+  color: var(--color-bone);
+}
+
+body {
+  font-family: var(--font-roboto), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-orbitron), sans-serif;
+  font-weight: 700;
+}
+
+@media (pointer: fine) {
+  :root,
+  a,
+  button,
+  [role="button"] {
+    cursor: none;
+  }
+}
+
+@media (pointer: coarse) {
+  :root,
+  a,
+  button,
+  [role="button"] {
+    cursor: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Capabilities icon animations */
+.cap-anim {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-play-state: paused;
+}
+[data-cap-card="hover"] .cap-anim,
+[data-cap-card]:hover .cap-anim {
+  animation-play-state: running;
+}
+@keyframes cap-spin-chuck {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes cap-spin-mill {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes cap-spin-wheel {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes cap-tool-y {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes cap-traverse-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(36px);
+  }
+}
+@keyframes cap-spark {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cap-anim {
+    animation: none !important;
+  }
+}
+
+/* Contact — form field focus */
+.form-field-input:focus {
+  border-bottom-color: #2b5ba6 !important;
+}
+.form-field-input:focus ~ .form-field-glow {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* Contact — submit indeterminate progress bar */
+@keyframes contact-progress {
+  0% {
+    left: -40%;
+    width: 40%;
+  }
+  50% {
+    left: 30%;
+    width: 50%;
+  }
+  100% {
+    left: 100%;
+    width: 40%;
+  }
+}
+.contact-progress-bar {
+  animation: contact-progress 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-progress-bar {
+    animation: none;
+  }
+}
+
+/* Footer — link hover leading line */
+.footer-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  transition: color 220ms cubic-bezier(0.25, 1, 0.5, 1),
+    transform 220ms cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+}
+.footer-link::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: #2b5ba6;
+  transform: translateY(-50%) scaleX(0);
+  transform-origin: right center;
+  transition: transform 220ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+.footer-link:hover,
+.footer-link:focus-visible {
+  color: #f5f5f5;
+  transform: translateX(2px);
+}
+.footer-link:hover::before,
+.footer-link:focus-visible::before {
+  transform: translateY(-50%) scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer-link,
+  .footer-link::before {
+    transition: none !important;
+    transform: none !important;
+  }
+  .footer-link:hover,
+  .footer-link:focus-visible {
+    transform: none !important;
+  }
+  .footer-link:hover::before,
+  .footer-link:focus-visible::before {
+    transform: translateY(-50%) scaleX(1) !important;
+  }
+}
+
+/* About — callouts hover */
+.about-callouts:hover [data-about="callout-line"] {
+  stroke: rgba(43, 91, 166, 1);
+}
+.about-callouts:hover [data-about="callout-dot"],
+.about-callouts:hover [data-about="callout-label"] {
+  filter: drop-shadow(0 0 8px rgba(43, 91, 166, 0.5));
+}
+
+/* Capabilities — editorial-row hover */
+.cap-row:hover {
+  border-top-color: rgba(43, 91, 166, 1) !important;
+}
+.cap-row:hover + .cap-row {
+  border-top-color: rgba(43, 91, 166, 1) !important;
+}
+.cap-row:hover .cap-row-index {
+  color: rgba(192, 197, 206, 0.3) !important;
+}
+.cap-row:hover .cap-row-underline {
+  width: 80px;
+}
+.cap-row:hover .cap-row-icon-mobile,
+.cap-row:hover [data-cap-row="icon"] {
+  filter: drop-shadow(0 0 10px rgba(43, 91, 166, 0.45));
+}
+@media (prefers-reduced-motion: reduce) {
+  .cap-row:hover .cap-row-underline {
+    width: 80px;
+  }
+}
+
+/* Equipment / Process — imperative progress dot + label states */
+.equip-progress-dot[data-active="false"] {
+  background-color: rgba(192, 197, 206, 0.3);
+}
+.equip-progress-dot[data-active="true"] {
+  background-color: #2b5ba6;
+  box-shadow: 0 0 8px rgba(43, 91, 166, 0.5);
+}
+.process-progress-dot[data-active="false"] {
+  background-color: rgba(149, 165, 166, 0.4);
+}
+.process-progress-dot[data-active="true"] {
+  background-color: #2b5ba6;
+  box-shadow: 0 0 16px rgba(43, 91, 166, 0.55);
+}
+.process-progress-label[data-active="false"] {
+  color: #95a5a6;
+}
+.process-progress-label[data-active="true"] {
+  color: #f5f5f5;
+}
+
+/* Industries — directory list item hover */
+.industry-li[data-active="true"] {
+  border-top-color: rgba(43, 91, 166, 0.6) !important;
+}
+.industry-li[data-active="true"] + .industry-li {
+  border-top-color: rgba(43, 91, 166, 0.6) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .industry-li-button {
+    transform: none !important;
+  }
+}
+
+/* Industries — topographic backdrop drift */
+@keyframes topo-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-200px);
+  }
+}
+.topo-drift {
+  animation: topo-drift 60s linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .topo-drift {
+    animation: none;
+  }
+}
