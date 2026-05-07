@@ -300,7 +300,7 @@ export default function About() {
       ref={sectionRef}
       id="about"
       aria-labelledby="about-heading"
-      className="relative w-full overflow-hidden bg-charcoal py-32 md:py-44"
+      className="relative w-full overflow-hidden bg-[#1B57C9] py-32 md:py-44"
     >
       {/* Vertical decorative text — far-left edge, md+ only */}
       <div
@@ -315,13 +315,13 @@ export default function About() {
             fontSize: "10px",
             fontWeight: 400,
             letterSpacing: "0.6em",
-            color: "rgba(192,197,206,0.15)",
+            color: "rgba(245,245,245,0.2)",
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
             whiteSpace: "nowrap",
           }}
         >
-          EST. NEW JERSEY <span className="text-royal">·</span> USA
+          EST. NEW JERSEY <span className="text-bone">·</span> USA
         </span>
       </div>
 
@@ -335,7 +335,7 @@ export default function About() {
             <span
               data-about="eyebrow"
               aria-hidden
-              className="mb-6 block font-display uppercase text-royalLight"
+              className="mb-6 block font-display uppercase text-bone"
               style={{
                 fontSize: "11px",
                 fontWeight: 400,
@@ -357,13 +357,13 @@ export default function About() {
               <span className="block overflow-hidden whitespace-nowrap">
                 <span data-about="heading-line" className="inline-block">
                   {HEADING_LINE_1}
-                  <span className="text-royal">.</span>
+                  <span className="text-bone">.</span>
                 </span>
               </span>
               <span className="block overflow-hidden whitespace-nowrap">
                 <span data-about="heading-line" className="inline-block">
                   {HEADING_LINE_2}
-                  <span className="text-royal">.</span>
+                  <span className="text-bone">.</span>
                 </span>
               </span>
             </h2>
@@ -441,12 +441,7 @@ export default function About() {
               <span
                 aria-hidden
                 className="pointer-events-none absolute inset-0"
-                style={{ backgroundColor: "rgba(43,91,166,0.06)" }}
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{ boxShadow: "inset 0 0 0 1px rgba(43,91,166,0.18)" }}
+                style={{ boxShadow: "inset 0 0 0 1px rgba(245,245,245,0.25)" }}
               />
 
               {/* Floating callouts (desktop only) — all anchored INSIDE photo */}
@@ -474,7 +469,7 @@ export default function About() {
                         y1={c.lineY1}
                         x2={c.lineX2}
                         y2={c.lineY2}
-                        stroke="rgba(43,91,166,0.5)"
+                        stroke="rgba(245,245,245,0.5)"
                         strokeWidth={1}
                       />
                       <rect
@@ -483,7 +478,7 @@ export default function About() {
                         y={c.dotY}
                         width={4}
                         height={4}
-                        fill="#2B5BA6"
+                        fill="#F5F5F5"
                         style={{
                           transformBox: "fill-box",
                           transformOrigin: "center",
@@ -500,7 +495,7 @@ export default function About() {
                       style={c.label}
                     >
                       <span
-                        className="font-display uppercase text-royalLight"
+                        className="font-display uppercase text-bone"
                         style={{
                           fontSize: "9px",
                           fontWeight: 400,
@@ -535,7 +530,7 @@ export default function About() {
                   data-about="para"
                   className="mb-6 font-body text-[16px] md:text-[17px]"
                   style={{
-                    color: "rgba(192,197,206,0.9)",
+                    color: "rgba(245,245,245,0.9)",
                     lineHeight: 1.7,
                   }}
                 >
@@ -544,7 +539,7 @@ export default function About() {
               ))}
               <p
                 data-about="para"
-                className="mt-6 border-t border-royal/30 pt-6 font-body text-[16px] font-medium text-bone md:text-[17px]"
+                className="mt-6 border-t border-bone/40 pt-6 font-body text-[16px] font-medium text-bone md:text-[17px]"
                 style={{ lineHeight: 1.7 }}
               >
                 {CLOSE_PARAGRAPH}
@@ -558,7 +553,7 @@ export default function About() {
           <span
             data-about="pull-bar"
             aria-hidden
-            className="mb-6 block h-14 w-px bg-royal"
+            className="mb-6 block h-14 w-px bg-bone"
           />
           <blockquote
             data-about="pull-quote"
@@ -570,25 +565,25 @@ export default function About() {
             }}
           >
             {PULL_QUOTE}
-            <span className="text-royal">.</span>
+            <span className="text-bone">.</span>
           </blockquote>
           <span
             data-about="pull-bar"
             aria-hidden
-            className="mt-6 block h-6 w-px bg-royal"
+            className="mt-6 block h-6 w-px bg-bone"
           />
         </div>
 
         {/* Cert badges */}
         <div className="mt-16 flex flex-wrap justify-center gap-3">
           <span data-about="badge" className="inline-flex">
-            <CertBadge label="AS9100" detail="AEROSPACE" />
+            <CertBadge label="AS9100" detail="AEROSPACE" tone="bone" />
           </span>
           <span data-about="badge" className="inline-flex">
-            <CertBadge label="ISO 9001" detail="QUALITY" />
+            <CertBadge label="ISO 9001" detail="QUALITY" tone="bone" />
           </span>
           <span data-about="badge" className="inline-flex">
-            <CertBadge label="ITAR" detail="REGISTERED" />
+            <CertBadge label="ITAR" detail="REGISTERED" tone="bone" />
           </span>
         </div>
       </div>

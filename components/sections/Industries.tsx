@@ -95,7 +95,7 @@ export default function Industries() {
     <section
       id="industries"
       aria-labelledby="industries-heading"
-      className="relative w-full overflow-hidden bg-charcoal py-28 md:py-36"
+      className="relative w-full overflow-hidden bg-[#1B57C9] py-28 md:py-36"
     >
       {/* Topographic backdrop */}
       <div ref={backdropRef} className="absolute inset-0 z-0">
@@ -108,7 +108,7 @@ export default function Industries() {
           <span
             data-ind-head
             aria-hidden
-            className="font-display text-[11px] uppercase text-royalLight"
+            className="font-display text-[11px] uppercase text-bone"
             style={{ fontWeight: 400, letterSpacing: "0.42em" }}
           >
             WHERE OUR PARTS LIVE
@@ -123,7 +123,7 @@ export default function Industries() {
               letterSpacing: "-0.02em",
             }}
           >
-            INDUSTRIES<span className="text-royal">.</span>
+            INDUSTRIES<span className="text-bone">.</span>
           </h2>
           <p
             data-ind-head
@@ -245,7 +245,7 @@ function MobileIndustryBlock({
   return (
     <li ref={ref} className="flex flex-col">
       <span
-        className="font-display uppercase text-royalLight"
+        className="font-display uppercase text-bone"
         style={{
           fontSize: "10px",
           fontWeight: 400,
@@ -254,7 +254,7 @@ function MobileIndustryBlock({
       >
         {industry.sectorCode}
       </span>
-      <div className="mt-4 h-14 w-14 text-royal" aria-hidden>
+      <div className="mt-4 h-14 w-14 text-bone" aria-hidden>
         <Icon />
       </div>
       <h3
@@ -266,9 +266,9 @@ function MobileIndustryBlock({
         }}
       >
         {industry.name}
-        <span className="text-royal">.</span>
+        <span className="text-bone">.</span>
       </h3>
-      <span aria-hidden className="mt-4 block h-px w-12 bg-royal" />
+      <span aria-hidden className="mt-4 block h-px w-12 bg-bone" />
       <p
         className="mt-4 font-body text-[16px]"
         style={{

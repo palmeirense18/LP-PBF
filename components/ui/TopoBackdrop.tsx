@@ -65,7 +65,7 @@ export default function TopoBackdrop({ className, style }: TopoBackdropProps) {
       >
         <g
           className="topo-drift"
-          stroke="rgba(192,197,206,0.05)"
+          stroke="rgba(245,245,245,0.08)"
           strokeWidth={1}
           fill="none"
           strokeLinecap="round"
@@ -81,7 +81,7 @@ export default function TopoBackdrop({ className, style }: TopoBackdropProps) {
               cx={d.cx}
               cy={d.cy}
               r={1}
-              fill="rgba(43,91,166,0.18)"
+              fill="rgba(245,245,245,0.18)"
             />
           ))}
         </g>

@@ -168,7 +168,7 @@ export default function Footer() {
         {/* Brand column */}
         <div data-footer="brand" className="lg:col-span-5">
           <div className="group/logo flex items-center">
-            <LogoMark size={32} className="text-silver" />
+            <LogoMark size={40} />
             <span
               className="ml-3 font-display font-bold uppercase text-bone"
               style={{ fontSize: "18px", letterSpacing: "0.18em" }}

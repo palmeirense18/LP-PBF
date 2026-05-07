@@ -52,7 +52,7 @@ export default function IndustryPreview({ industry }: IndustryPreviewProps) {
         >
           {/* Sector code eyebrow */}
           <span
-            className="mb-6 font-display uppercase text-royalLight"
+            className="mb-6 font-display uppercase text-bone"
             style={{
               fontSize: "10px",
               fontWeight: 400,
@@ -63,7 +63,7 @@ export default function IndustryPreview({ industry }: IndustryPreviewProps) {
           </span>
 
           {/* Icon */}
-          <div className="h-20 w-20 text-royal" aria-hidden>
+          <div className="h-20 w-20 text-bone" aria-hidden>
             <Icon />
           </div>
 
@@ -77,13 +77,13 @@ export default function IndustryPreview({ industry }: IndustryPreviewProps) {
             }}
           >
             {industry.name}
-            <span className="text-royal">.</span>
+            <span className="text-bone">.</span>
           </h3>
 
-          {/* Royal rule */}
+          {/* Bone rule */}
           <span
             aria-hidden
-            className="mt-6 block h-px w-14 bg-royal"
+            className="mt-6 block h-px w-14 bg-bone"
           />
 
           {/* Body */}

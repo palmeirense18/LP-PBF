@@ -1,4 +1,3 @@
-// TODO: when /public/brand/horizontal-logo.svg is available, replace the SVG mark + wordmark with <Image>.
 "use client";
 
 import LogoMark from "@/components/ui/LogoMark";
@@ -17,7 +16,7 @@ export default function Logo({
       onClick={onAnchorClick}
       className="group/logo inline-flex items-center gap-3 outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-royal"
     >
-      <LogoMark size={26} className="text-silver" />
+      <LogoMark size={36} />
 
       <span className="flex flex-col leading-none">
         <span

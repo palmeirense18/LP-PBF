@@ -50,14 +50,13 @@ export default function CapabilityRow({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const ctx = gsap.context(() => {
-      const indexEl = root.querySelector<HTMLElement>("[data-cap-row='index']");
       const stageEl = root.querySelector<HTMLElement>("[data-cap-row='stage']");
       const titleEl = root.querySelector<HTMLElement>("[data-cap-row='title']");
       const bodyEl = root.querySelector<HTMLElement>("[data-cap-row='body']");
       const tagsEl = root.querySelector<HTMLElement>("[data-cap-row='tags']");
       const iconEl = root.querySelector<HTMLElement>("[data-cap-row='icon']");
 
-      const targets = [indexEl, stageEl, titleEl, bodyEl, tagsEl, iconEl].filter(
+      const targets = [stageEl, titleEl, bodyEl, tagsEl, iconEl].filter(
         Boolean
       ) as HTMLElement[];
 
@@ -91,35 +90,33 @@ export default function CapabilityRow({
       className="cap-row group relative grid grid-cols-12 gap-6 py-12 md:gap-8 md:py-16"
       style={{
         borderTop: isFirst
-          ? "1px solid rgba(43,91,166,0.6)"
-          : "1px solid rgba(43,91,166,0.3)",
-        borderBottom: isLast ? "1px solid rgba(43,91,166,0.3)" : undefined,
+          ? "1px solid rgba(245,245,245,0.6)"
+          : "1px solid rgba(245,245,245,0.3)",
+        borderBottom: isLast ? "1px solid rgba(245,245,245,0.3)" : undefined,
         transition: "border-color 280ms cubic-bezier(0.25,1,0.5,1)",
       }}
     >
       {/* Index block — cols 1-2 on md+, full width above content on mobile */}
       <div className="col-span-12 md:col-span-2 md:col-start-1">
-        <div className="flex items-end justify-between gap-4 md:block">
+        <div className="flex items-start justify-between gap-4 md:block">
           <span
-            data-cap-row="index"
+            data-cap-row="stage"
             aria-hidden
-            className="cap-row-index block font-display font-bold uppercase"
+            className="inline-block font-display uppercase text-bone/80"
             style={{
-              fontSize: "clamp(72px, 9vw, 144px)",
-              lineHeight: 0.85,
-              letterSpacing: "-0.04em",
-              color: "rgba(192,197,206,0.12)",
-              transition: "color 280ms cubic-bezier(0.25,1,0.5,1)",
+              fontSize: "10px",
+              fontWeight: 400,
+              letterSpacing: "0.4em",
             }}
           >
-            {indexLabel}
+            STAGE {indexLabel}
           </span>
 
           {/* Mobile-only icon (top-right of stacked block) */}
           <div
             data-cap-row="icon"
             aria-hidden
-            className="cap-row-icon-mobile h-10 w-10 shrink-0 text-royal md:hidden"
+            className="cap-row-icon-mobile h-10 w-10 shrink-0 text-bone md:hidden"
             style={{
               transition: "filter 280ms cubic-bezier(0.25,1,0.5,1)",
             }}
@@ -127,22 +124,10 @@ export default function CapabilityRow({
             <Icon />
           </div>
         </div>
-        <span
-          data-cap-row="stage"
-          aria-hidden
-          className="mt-2 inline-block font-display uppercase text-royalLight"
-          style={{
-            fontSize: "10px",
-            fontWeight: 400,
-            letterSpacing: "0.4em",
-          }}
-        >
-          STAGE {indexLabel}
-        </span>
       </div>
 
       {/* Content block — cols 3-9 */}
-      <div className="col-span-12 md:col-span-7 md:col-start-3">
+      <div className="col-span-12 md:col-span-8 md:col-start-3">
         <h3
           data-cap-row="title"
           className="mb-4 font-display font-bold uppercase text-bone"
@@ -153,11 +138,11 @@ export default function CapabilityRow({
           }}
         >
           {title}
-          <span className="text-royal">.</span>
+          <span className="text-bone">.</span>
         </h3>
         <span
           aria-hidden
-          className="cap-row-underline mb-6 block h-px bg-royal"
+          className="cap-row-underline mb-6 block h-px bg-bone"
           style={{
             width: 0,
             transition: "width 320ms cubic-bezier(0.25,1,0.5,1)",
@@ -191,7 +176,7 @@ export default function CapabilityRow({
             >
               {tag}
               {i < tags.length - 1 ? (
-                <span aria-hidden className="text-royal">
+                <span aria-hidden className="text-bone">
                   ·
                 </span>
               ) : null}
@@ -203,7 +188,7 @@ export default function CapabilityRow({
       {/* Icon block — cols 11-12, desktop only (mobile icon shown above) */}
       <div
         data-cap-row="icon"
-        className="col-span-2 col-start-11 hidden self-center text-royal md:block"
+        className="col-span-2 col-start-11 hidden self-center text-bone md:block"
         style={{
           transition: "filter 280ms cubic-bezier(0.25,1,0.5,1)",
         }}

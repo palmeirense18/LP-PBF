@@ -203,29 +203,26 @@ h6 {
 
 /* About — callouts hover */
 .about-callouts:hover [data-about="callout-line"] {
-  stroke: rgba(43, 91, 166, 1);
+  stroke: rgba(245, 245, 245, 1);
 }
 .about-callouts:hover [data-about="callout-dot"],
 .about-callouts:hover [data-about="callout-label"] {
-  filter: drop-shadow(0 0 8px rgba(43, 91, 166, 0.5));
+  filter: drop-shadow(0 0 8px rgba(245, 245, 245, 0.5));
 }
 
 /* Capabilities — editorial-row hover */
 .cap-row:hover {
-  border-top-color: rgba(43, 91, 166, 1) !important;
+  border-top-color: rgba(245, 245, 245, 1) !important;
 }
 .cap-row:hover + .cap-row {
-  border-top-color: rgba(43, 91, 166, 1) !important;
-}
-.cap-row:hover .cap-row-index {
-  color: rgba(192, 197, 206, 0.3) !important;
+  border-top-color: rgba(245, 245, 245, 1) !important;
 }
 .cap-row:hover .cap-row-underline {
   width: 80px;
 }
 .cap-row:hover .cap-row-icon-mobile,
 .cap-row:hover [data-cap-row="icon"] {
-  filter: drop-shadow(0 0 10px rgba(43, 91, 166, 0.45));
+  filter: drop-shadow(0 0 12px rgba(245, 245, 245, 0.4));
 }
 @media (prefers-reduced-motion: reduce) {
   .cap-row:hover .cap-row-underline {
@@ -257,10 +254,10 @@ h6 {
 
 /* Industries — directory list item hover */
 .industry-li[data-active="true"] {
-  border-top-color: rgba(43, 91, 166, 0.6) !important;
+  border-top-color: rgba(245, 245, 245, 0.6) !important;
 }
 .industry-li[data-active="true"] + .industry-li {
-  border-top-color: rgba(43, 91, 166, 0.6) !important;
+  border-top-color: rgba(245, 245, 245, 0.6) !important;
 }
 @media (prefers-reduced-motion: reduce) {
   .industry-li-button {

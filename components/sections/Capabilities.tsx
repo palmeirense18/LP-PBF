@@ -77,7 +77,7 @@ export default function Capabilities() {
     <section
       id="capabilities"
       aria-labelledby="capabilities-heading"
-      className="relative w-full bg-charcoal py-28 md:py-36"
+      className="relative w-full bg-[#1B57C9] py-28 md:py-36"
     >
       <div ref={ref} className="mx-auto max-w-[1440px] px-6 md:px-10">
         {/* Header block */}
@@ -85,7 +85,7 @@ export default function Capabilities() {
           <span
             data-cap-head
             aria-hidden
-            className="font-display text-[11px] uppercase text-royalLight"
+            className="font-display text-[11px] uppercase text-bone"
             style={{ fontWeight: 400, letterSpacing: "0.42em" }}
           >
             WHAT WE DO
@@ -101,7 +101,7 @@ export default function Capabilities() {
               letterSpacing: "-0.02em",
             }}
           >
-            CAPABILITIES<span className="text-royal">.</span>
+            MORI SEIKI MACHINES<span className="text-bone">.</span>
           </h2>
 
           <p

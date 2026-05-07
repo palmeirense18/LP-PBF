@@ -327,7 +327,7 @@ function PinnedVariant({ activeIndex, setActiveIndex }: PinnedVariantProps) {
                         className="pointer-events-none absolute inset-0"
                         style={{
                           background:
-                            "linear-gradient(180deg, rgba(10,10,10,0.35), rgba(10,10,10,0.65))",
+                            "linear-gradient(180deg, rgba(10,10,10,0.25), rgba(10,10,10,0.55))",
                         }}
                       />
                     )}

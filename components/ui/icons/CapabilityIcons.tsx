@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
 
-const ROYAL = "#2B5BA6";
 const SILVER = "#C0C5CE";
 
 const animBase: CSSProperties = {
@@ -32,7 +31,7 @@ const svgProps = {
   width: "100%",
   height: "100%",
   fill: "none",
-  stroke: ROYAL,
+  stroke: "currentColor",
   strokeWidth: 1.5,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
@@ -68,7 +67,7 @@ export function TurningIcon() {
         <line x1="16" y1="32" x2="12" y2="38.928" />
         <line x1="16" y1="32" x2="12" y2="25.072" />
         {/* Hub dot */}
-        <circle cx="16" cy="32" r="1.2" fill={ROYAL} stroke="none" />
+        <circle cx="16" cy="32" r="1.2" fill="currentColor" stroke="none" />
       </g>
 
       {/* Headstock body (static) */}
@@ -84,7 +83,7 @@ export function TurningIcon() {
         className="cap-anim cap-tool-y"
         style={animStyle("cap-tool-y", "1.8s", "ease-in-out")}
       >
-        <path d="M38 14 L46 14 L42 22 Z" fill={ROYAL} stroke={ROYAL} />
+        <path d="M38 14 L46 14 L42 22 Z" fill="currentColor" stroke="currentColor" />
       </g>
     </svg>
   );
@@ -137,7 +136,7 @@ export function MillingIcon() {
         fontFamily="var(--font-orbitron), sans-serif"
         fontSize="6"
         fontWeight={400}
-        fill={ROYAL}
+        fill="currentColor"
         stroke="none"
       >
         X
@@ -214,7 +213,7 @@ export function GrindingIcon() {
             x2={s.x2}
             y2={s.y2}
             strokeWidth={1}
-            stroke={ROYAL}
+            stroke="currentColor"
           />
         </g>
       ))}
