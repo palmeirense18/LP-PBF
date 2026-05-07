@@ -349,18 +349,18 @@ export default function About() {
               id="about-heading"
               className="font-display font-bold uppercase text-bone"
               style={{
-                fontSize: "clamp(36px, 4.4vw, 60px)",
+                fontSize: "clamp(24px, 5.2vw, 60px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.01em",
               }}
             >
-              <span className="block overflow-hidden whitespace-nowrap">
+              <span className="block overflow-x-visible overflow-y-clip whitespace-nowrap">
                 <span data-about="heading-line" className="inline-block">
                   {HEADING_LINE_1}
                   <span className="text-bone">.</span>
                 </span>
               </span>
-              <span className="block overflow-hidden whitespace-nowrap">
+              <span className="block overflow-x-visible overflow-y-clip whitespace-nowrap">
                 <span data-about="heading-line" className="inline-block">
                   {HEADING_LINE_2}
                   <span className="text-bone">.</span>

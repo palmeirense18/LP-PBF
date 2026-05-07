@@ -14,9 +14,14 @@ export default function Logo({
       href={href}
       data-cursor="hover"
       onClick={onAnchorClick}
-      className="group/logo inline-flex items-center gap-3 outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-royal"
+      className="group/logo inline-flex items-center gap-2.5 outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-royal md:gap-3"
     >
-      <LogoMark size={36} />
+      <span className="block md:hidden">
+        <LogoMark size={32} />
+      </span>
+      <span className="hidden md:block">
+        <LogoMark size={36} />
+      </span>
 
       <span className="flex flex-col leading-none">
         <span

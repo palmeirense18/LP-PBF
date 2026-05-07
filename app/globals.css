@@ -61,6 +61,30 @@ h6 {
   }
 }
 
+/* Hero — H1 + subhead text shadows (mobile gets stronger halo over video) */
+.hero-h1 {
+  text-shadow:
+    0 2px 32px rgba(0, 0, 0, 0.95),
+    0 0 12px rgba(0, 0, 0, 0.85),
+    0 1px 0 rgba(0, 0, 0, 0.5);
+}
+.hero-subhead {
+  text-shadow:
+    0 1px 12px rgba(0, 0, 0, 0.85),
+    0 0 4px rgba(0, 0, 0, 0.6);
+}
+@media (min-width: 768px) {
+  .hero-h1 {
+    text-shadow:
+      0 2px 24px rgba(0, 0, 0, 0.85),
+      0 0 8px rgba(0, 0, 0, 0.7),
+      0 1px 0 rgba(0, 0, 0, 0.4);
+  }
+  .hero-subhead {
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+  }
+}
+
 /* Capabilities icon animations */
 .cap-anim {
   transform-box: fill-box;

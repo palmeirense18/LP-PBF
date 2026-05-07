@@ -8,12 +8,14 @@ import { gsap, setupGsap } from "@/components/animations/gsap";
 const FRAME_COUNT = 240;
 const FRAME_PATH = (i: number) => `/hero/frames/frame-${String(i).padStart(3, "0")}.jpg`;
 
+type MountMode = "desktop-scrub" | "mobile-loop" | "reduced-static";
+
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const framesRef = useRef<HTMLImageElement[]>([]);
   const currentFrameRef = useRef(0);
-  const [, setFramesReady] = useState(false);
+  const [mountMode, setMountMode] = useState<MountMode | null>(null);
 
   const eyebrowRef = useRef<HTMLSpanElement>(null);
   const line1Ref = useRef<HTMLSpanElement>(null);
@@ -21,6 +23,26 @@ export default function Hero() {
   const subheadRef = useRef<HTMLParagraphElement>(null);
   const ctasRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
+
+  // Decide variant after first paint (avoids SSR mismatch)
+  useEffect(() => {
+    const decide = () => {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const desktop = window.matchMedia("(min-width: 768px) and (pointer: fine)").matches;
+      if (reduced) setMountMode("reduced-static");
+      else if (desktop) setMountMode("desktop-scrub");
+      else setMountMode("mobile-loop");
+    };
+    decide();
+    const mqDesktop = window.matchMedia("(min-width: 768px) and (pointer: fine)");
+    const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    mqDesktop.addEventListener("change", decide);
+    mqReduced.addEventListener("change", decide);
+    return () => {
+      mqDesktop.removeEventListener("change", decide);
+      mqReduced.removeEventListener("change", decide);
+    };
+  }, []);
 
   const drawFrame = (index: number) => {
     const canvas = canvasRef.current;
@@ -52,33 +74,13 @@ export default function Hero() {
     currentFrameRef.current = index;
   };
 
+  // Preload frames + bind canvas — desktop scrub only
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const desktop = window.matchMedia("(min-width: 768px) and (pointer: fine)").matches;
+    if (mountMode !== "desktop-scrub") return;
 
     let cancelled = false;
     const images: HTMLImageElement[] = [];
-
-    if (!desktop || reduced) {
-      // Mobile / reduced-motion: only load the middle frame
-      const midIndex = Math.floor(FRAME_COUNT / 2);
-      const img = new Image();
-      images[midIndex] = img;
-      img.src = FRAME_PATH(midIndex);
-      img.onload = () => {
-        if (cancelled) return;
-        framesRef.current = images;
-        drawFrame(midIndex);
-        setFramesReady(true);
-      };
-      framesRef.current = images;
-      return () => {
-        cancelled = true;
-      };
-    }
-
     let loaded = 0;
-    let readyFlagged = false;
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
       img.src = FRAME_PATH(i);
@@ -86,22 +88,19 @@ export default function Hero() {
         if (cancelled) return;
         loaded++;
         if (i === 0) drawFrame(0);
-        if (!readyFlagged && loaded >= Math.floor(FRAME_COUNT * 0.8)) {
-          readyFlagged = true;
-          setFramesReady(true);
-        }
       };
       images.push(img);
     }
     framesRef.current = images;
-
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mountMode]);
 
+  // Resize canvas (DPR-aware) — desktop scrub only
   useEffect(() => {
+    if (mountMode !== "desktop-scrub") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const resize = () => {
@@ -115,23 +114,13 @@ export default function Hero() {
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mountMode]);
 
+  // Scroll-scrub — desktop only
   useEffect(() => {
+    if (mountMode !== "desktop-scrub") return;
     const section = sectionRef.current;
     if (!section) return;
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const desktop = window.matchMedia("(min-width: 768px) and (pointer: fine)").matches;
-
-    if (!desktop || reduced) {
-      const midIndex = Math.floor(FRAME_COUNT / 2);
-      const tryDraw = () => drawFrame(midIndex);
-      const img = framesRef.current[midIndex];
-      if (img?.complete) tryDraw();
-      else img?.addEventListener("load", tryDraw, { once: true });
-      return;
-    }
 
     let rafId = 0;
     const update = () => {
@@ -157,8 +146,9 @@ export default function Hero() {
       window.removeEventListener("scroll", onScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [mountMode]);
 
+  // Entrance choreography
   useEffect(() => {
     setupGsap();
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -201,12 +191,43 @@ export default function Hero() {
   return (
     <section ref={sectionRef} className="relative w-full h-screen md:h-[200vh] bg-ink">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        <canvas
-          ref={canvasRef}
-          aria-hidden
-          className="absolute inset-0 block h-full w-full"
-          style={{ background: "#0A0A0A" }}
-        />
+        {/* Background visual: canvas (desktop scrub) / video loop (mobile) / poster (reduced) */}
+        {mountMode === "desktop-scrub" && (
+          <canvas
+            ref={canvasRef}
+            aria-hidden
+            className="absolute inset-0 block h-full w-full"
+            style={{ background: "#0A0A0A" }}
+          />
+        )}
+
+        {mountMode === "mobile-loop" && (
+          <video
+            src="/hero/video-hero-mobile.mp4"
+            poster="/hero/video-hero-poster.jpg"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ background: "#0A0A0A" }}
+          />
+        )}
+
+        {mountMode === "reduced-static" && (
+          <video
+            src="/hero/video-hero-mobile.mp4"
+            poster="/hero/video-hero-poster.jpg"
+            muted
+            playsInline
+            preload="metadata"
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ background: "#0A0A0A" }}
+          />
+        )}
 
         <span
           aria-hidden
@@ -241,13 +262,11 @@ export default function Hero() {
             </span>
 
             <h1
-              className="font-display font-bold uppercase text-bone"
+              className="hero-h1 font-display font-bold uppercase text-bone"
               style={{
                 fontSize: "clamp(40px, 5.2vw, 80px)",
                 lineHeight: 0.95,
                 letterSpacing: "-0.02em",
-                textShadow:
-                  "0 2px 24px rgba(0,0,0,0.85), 0 0 8px rgba(0,0,0,0.7), 0 1px 0 rgba(0,0,0,0.4)",
               }}
             >
               <span className="block overflow-hidden whitespace-nowrap">
@@ -264,8 +283,7 @@ export default function Hero() {
 
             <p
               ref={subheadRef}
-              className="mx-auto mt-6 max-w-md font-body text-[16px] leading-relaxed text-mediumGray md:mx-0 md:text-[18px]"
-              style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
+              className="hero-subhead mx-auto mt-6 max-w-md rounded-sm bg-ink/35 px-4 py-3 font-body text-[16px] leading-relaxed text-mediumGray backdrop-blur-[3px] md:mx-0 md:bg-transparent md:p-0 md:text-[18px] md:backdrop-blur-none"
             >
               High-tolerance CNC machining for the industries that build the modern world.
               Aerospace. Defense. Automotive. Medical. Industrial.

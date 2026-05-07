@@ -131,7 +131,7 @@ export default function StatCounter({
   return (
     <div
       ref={wrapperRef}
-      className="flex min-h-[160px] flex-col items-center justify-center px-4 py-10 text-center md:py-0"
+      className="flex min-h-[160px] flex-col items-center justify-center px-3 py-10 text-center md:px-4 md:py-0"
       style={{ opacity: 0 }}
     >
       <span
@@ -139,7 +139,7 @@ export default function StatCounter({
         aria-hidden="true"
         className="font-display font-bold tabular-nums text-bone"
         style={{
-          fontSize: "clamp(40px, 6vw, 72px)",
+          fontSize: "clamp(28px, 4.8vw, 64px)",
           letterSpacing: "-0.01em",
           lineHeight: 0.95,
           textShadow: "0 0 24px rgba(43, 91, 166, 0.18)",
