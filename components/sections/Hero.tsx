@@ -5,17 +5,9 @@ import Button from "@/components/ui/Button";
 import ScrollIndicator from "@/components/ui/ScrollIndicator";
 import { gsap, setupGsap } from "@/components/animations/gsap";
 
-const FRAME_COUNT = 240;
-const FRAME_PATH = (i: number) => `/hero/frames/frame-${String(i).padStart(3, "0")}.jpg`;
-
-type MountMode = "desktop-scrub" | "mobile-loop" | "reduced-static";
-
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const framesRef = useRef<HTMLImageElement[]>([]);
-  const currentFrameRef = useRef(0);
-  const [mountMode, setMountMode] = useState<MountMode | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   const eyebrowRef = useRef<HTMLSpanElement>(null);
   const line1Ref = useRef<HTMLSpanElement>(null);
@@ -24,129 +16,13 @@ export default function Hero() {
   const ctasRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
 
-  // Decide variant after first paint (avoids SSR mismatch)
   useEffect(() => {
-    const decide = () => {
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const desktop = window.matchMedia("(min-width: 768px) and (pointer: fine)").matches;
-      if (reduced) setMountMode("reduced-static");
-      else if (desktop) setMountMode("desktop-scrub");
-      else setMountMode("mobile-loop");
-    };
-    decide();
-    const mqDesktop = window.matchMedia("(min-width: 768px) and (pointer: fine)");
-    const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    mqDesktop.addEventListener("change", decide);
-    mqReduced.addEventListener("change", decide);
-    return () => {
-      mqDesktop.removeEventListener("change", decide);
-      mqReduced.removeEventListener("change", decide);
-    };
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mq.matches);
+    const onChange = () => setReduceMotion(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
-
-  const drawFrame = (index: number) => {
-    const canvas = canvasRef.current;
-    const img = framesRef.current[index];
-    if (!canvas || !img || !img.complete || img.naturalWidth === 0) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const cw = canvas.width;
-    const ch = canvas.height;
-    const iw = img.naturalWidth;
-    const ih = img.naturalHeight;
-    const cAR = cw / ch;
-    const iAR = iw / ih;
-
-    let sx = 0,
-      sy = 0,
-      sw = iw,
-      sh = ih;
-    if (iAR > cAR) {
-      sw = ih * cAR;
-      sx = (iw - sw) / 2;
-    } else {
-      sh = iw / cAR;
-      sy = (ih - sh) / 2;
-    }
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
-    currentFrameRef.current = index;
-  };
-
-  // Preload frames + bind canvas — desktop scrub only
-  useEffect(() => {
-    if (mountMode !== "desktop-scrub") return;
-
-    let cancelled = false;
-    const images: HTMLImageElement[] = [];
-    let loaded = 0;
-    for (let i = 0; i < FRAME_COUNT; i++) {
-      const img = new Image();
-      img.src = FRAME_PATH(i);
-      img.onload = () => {
-        if (cancelled) return;
-        loaded++;
-        if (i === 0) drawFrame(0);
-      };
-      images.push(img);
-    }
-    framesRef.current = images;
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mountMode]);
-
-  // Resize canvas (DPR-aware) — desktop scrub only
-  useEffect(() => {
-    if (mountMode !== "desktop-scrub") return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-      drawFrame(currentFrameRef.current);
-    };
-    resize();
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mountMode]);
-
-  // Scroll-scrub — desktop only
-  useEffect(() => {
-    if (mountMode !== "desktop-scrub") return;
-    const section = sectionRef.current;
-    if (!section) return;
-
-    let rafId = 0;
-    const update = () => {
-      const rect = section.getBoundingClientRect();
-      const sectionHeight = section.offsetHeight;
-      const viewport = window.innerHeight;
-      const scrolled = -rect.top;
-      const total = Math.max(1, sectionHeight - viewport);
-      const progress = Math.max(0, Math.min(1, scrolled / total));
-      const targetIndex = Math.min(FRAME_COUNT - 1, Math.floor(progress * FRAME_COUNT));
-      if (targetIndex !== currentFrameRef.current) {
-        drawFrame(targetIndex);
-      }
-      rafId = 0;
-    };
-    const onScroll = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(update);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    update();
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [mountMode]);
 
   // Entrance choreography
   useEffect(() => {
@@ -189,45 +65,34 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative w-full h-screen md:h-[200vh] bg-ink">
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Background visual: canvas (desktop scrub) / video loop (mobile) / poster (reduced) */}
-        {mountMode === "desktop-scrub" && (
-          <canvas
-            ref={canvasRef}
-            aria-hidden
-            className="absolute inset-0 block h-full w-full"
-            style={{ background: "#0A0A0A" }}
-          />
-        )}
-
-        {mountMode === "mobile-loop" && (
-          <video
-            src="/hero/video-hero-mobile.mp4"
-            poster="/hero/video-hero-poster.jpg"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            aria-hidden
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ background: "#0A0A0A" }}
-          />
-        )}
-
-        {mountMode === "reduced-static" && (
-          <video
-            src="/hero/video-hero-mobile.mp4"
-            poster="/hero/video-hero-poster.jpg"
-            muted
-            playsInline
-            preload="metadata"
-            aria-hidden
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ background: "#0A0A0A" }}
-          />
-        )}
+    <section ref={sectionRef} className="relative w-full h-screen bg-ink">
+      <div className="relative h-full w-full overflow-hidden">
+        {/* Desktop / wide viewports */}
+        <video
+          className="absolute inset-0 h-full w-full object-cover hidden md:block"
+          src="/hero/video-hero-loop.mp4"
+          autoPlay={!reduceMotion}
+          loop={!reduceMotion}
+          muted
+          playsInline
+          preload="auto"
+          poster="/hero/video-hero-poster.jpg"
+          aria-hidden
+          style={{ background: "#0A0A0A" }}
+        />
+        {/* Mobile / narrow viewports */}
+        <video
+          className="absolute inset-0 h-full w-full object-cover md:hidden"
+          src="/hero/video-hero-loop-mobile.mp4"
+          autoPlay={!reduceMotion}
+          loop={!reduceMotion}
+          muted
+          playsInline
+          preload="auto"
+          poster="/hero/video-hero-poster.jpg"
+          aria-hidden
+          style={{ background: "#0A0A0A" }}
+        />
 
         <span
           aria-hidden
