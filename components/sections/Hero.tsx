@@ -8,7 +8,10 @@ import { gsap, setupGsap } from "@/components/animations/gsap";
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
+  const desktopVideoRef = useRef<HTMLVideoElement>(null);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const eyebrowRef = useRef<HTMLSpanElement>(null);
   const line1Ref = useRef<HTMLSpanElement>(null);
   const line2Ref = useRef<HTMLSpanElement>(null);
@@ -22,6 +25,31 @@ export default function Hero() {
     const onChange = () => setReduceMotion(mq.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  // Defensive autoplay: explicitly call .play() after mount; flag blocked autoplay.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const tryPlay = (video: HTMLVideoElement | null) => {
+      if (!video) return Promise.resolve("nop" as const);
+      video.muted = true;
+      video.playsInline = true;
+      const p = video.play();
+      return p && typeof p.then === "function"
+        ? p.then(() => "ok" as const)
+        : Promise.resolve("ok" as const);
+    };
+
+    Promise.all([
+      tryPlay(desktopVideoRef.current).catch(() => "blocked" as const),
+      tryPlay(mobileVideoRef.current).catch(() => "blocked" as const),
+    ]).then((results) => {
+      const realResults = results.filter((r) => r !== "nop");
+      if (realResults.length > 0 && realResults.every((r) => r === "blocked")) {
+        setAutoplayBlocked(true);
+      }
+    });
   }, []);
 
   // Entrance choreography
@@ -69,6 +97,7 @@ export default function Hero() {
       <div className="relative h-full w-full overflow-hidden">
         {/* Desktop / wide viewports */}
         <video
+          ref={desktopVideoRef}
           className="absolute inset-0 h-full w-full object-cover hidden md:block"
           src="/hero/video-hero-loop.mp4"
           autoPlay={!reduceMotion}
@@ -82,6 +111,7 @@ export default function Hero() {
         />
         {/* Mobile / narrow viewports */}
         <video
+          ref={mobileVideoRef}
           className="absolute inset-0 h-full w-full object-cover md:hidden"
           src="/hero/video-hero-loop-mobile.mp4"
           autoPlay={!reduceMotion}
@@ -94,9 +124,34 @@ export default function Hero() {
           style={{ background: "#0A0A0A" }}
         />
 
+        {/* Mobile-only tap-to-play fallback when autoplay is blocked. */}
+        {autoplayBlocked && !reduceMotion && (
+          <button
+            type="button"
+            onClick={() => {
+              const v = mobileVideoRef.current ?? desktopVideoRef.current;
+              if (!v) return;
+              v.muted = true;
+              v.playsInline = true;
+              v.play()
+                .then(() => setAutoplayBlocked(false))
+                .catch(() => {});
+            }}
+            aria-label="Tap to play hero animation"
+            className="absolute inset-0 z-[15] flex items-center justify-center bg-transparent cursor-pointer md:hidden"
+          >
+            <span
+              className="font-display uppercase text-bone bg-ink/70 backdrop-blur-sm px-5 py-3 rounded-sm pointer-events-none"
+              style={{ fontSize: "12px", letterSpacing: "0.32em" }}
+            >
+              ▶ TAP TO PLAY
+            </span>
+          </button>
+        )}
+
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-[5] hidden md:block"
+          className="pointer-events-none absolute inset-0 z-[20] hidden md:block"
           style={{
             background:
               "linear-gradient(90deg, transparent 0%, transparent 32%, rgba(10,10,10,0.55) 58%, rgba(10,10,10,0.92) 100%)",
@@ -105,14 +160,14 @@ export default function Hero() {
 
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-[5] md:hidden"
+          className="pointer-events-none absolute inset-0 z-[20] md:hidden"
           style={{
             background:
               "linear-gradient(180deg, transparent 0%, transparent 40%, rgba(10,10,10,0.55) 70%, rgba(10,10,10,0.92) 100%)",
           }}
         />
 
-        <div className="absolute inset-0 z-10 flex h-full w-full items-center justify-center md:left-auto md:right-0 md:w-[52%] md:justify-start">
+        <div className="absolute inset-0 z-30 flex h-full w-full items-center justify-center md:left-auto md:right-0 md:w-[52%] md:justify-start">
           <div className="w-full max-w-xl px-6 text-center md:pl-12 md:pr-8 md:text-left lg:pr-12">
             <span
               ref={eyebrowRef}
