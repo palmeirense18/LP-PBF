@@ -14,7 +14,7 @@ export default function LogoMark({
   withTile = true,
 }: LogoMarkProps) {
   const tileSize = withTile ? Math.round(size * 1.1) : size;
-  const iconSize = withTile ? Math.round(tileSize * 0.92) : size;
+  const iconSize = withTile ? Math.round(tileSize * 0.86) : size;
 
   return (
     <span
@@ -31,7 +31,6 @@ export default function LogoMark({
           ? "0 0 0 1px rgba(245, 240, 230, 0.18), 0 4px 14px rgba(0, 0, 0, 0.35)"
           : "none",
         position: "relative",
-        overflow: "hidden",
       }}
       aria-hidden
     >
@@ -49,7 +48,7 @@ export default function LogoMark({
           fill
           sizes={`${iconSize}px`}
           priority
-          style={{ objectFit: "contain" }}
+          style={{ objectFit: "contain", objectPosition: "center" }}
         />
       </span>
     </span>

@@ -4,7 +4,7 @@ const SRC = "LOGO.jpeg";
 const OUT_ICON = "public/brand/logo-icon.png";
 
 const meta = await sharp(SRC).metadata();
-const iconHeight = Math.round(meta.height * 0.62); // top 62% holds the circular emblem
+const iconHeight = Math.round(meta.height * 0.67); // top 67% safely captures full gear + buffer above wordmark
 
 // Crop the top icon region, then chroma-key the off-white background to transparent.
 // The off-white in this logo is approximately rgb(238, 238, 238)..rgb(248, 248, 248).
