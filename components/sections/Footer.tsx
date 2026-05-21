@@ -168,7 +168,7 @@ export default function Footer() {
         {/* Brand column */}
         <div data-footer="brand" className="lg:col-span-5">
           <div className="group/logo flex items-center">
-            <LogoMark size={40} />
+            <LogoMark size={48} withTile />
             <span
               className="ml-3 font-display font-bold uppercase text-bone"
               style={{ fontSize: "18px", letterSpacing: "0.18em" }}
@@ -208,9 +208,9 @@ export default function Footer() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2 [&>*]:origin-left [&>*]:scale-90">
-            <CertBadge label="AS9100" detail="AEROSPACE" />
-            <CertBadge label="ISO 9001" detail="QUALITY" />
-            <CertBadge label="ITAR" detail="REGISTERED" />
+            <CertBadge label="MULTI-AXIS" detail="CAPABILITY" />
+            <CertBadge label="DOMESTIC" detail="SOURCING" />
+            <CertBadge label="CMM" detail="VERIFIED" />
           </div>
         </div>
 

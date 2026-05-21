@@ -21,7 +21,7 @@ export const INDUSTRIES: readonly Industry[] = [
     name: "AEROSPACE",
     sectorCode: "AERO · 01",
     body:
-      "Structural brackets, fasteners, and turbine components produced to AS9100 traceability.",
+      "Structural brackets, fasteners, and turbine components produced with full material traceability and rigorous in-process inspection.",
   },
   {
     id: "defense",
@@ -29,7 +29,7 @@ export const INDUSTRIES: readonly Industry[] = [
     name: "DEFENSE",
     sectorCode: "DEF · 02",
     body:
-      "Weapon system housings, optical mounts, and ITAR-controlled assemblies for prime contractors.",
+      "Weapon system housings, optical mounts, and export-controlled assemblies for prime contractors.",
   },
   {
     id: "automotive",

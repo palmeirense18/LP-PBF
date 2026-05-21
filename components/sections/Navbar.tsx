@@ -120,7 +120,7 @@ export default function Navbar() {
   return (
     <>
       <header role="banner" className={navClass}>
-        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 md:h-[72px] md:px-10">
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-6 md:h-24 md:px-10">
           <Logo onAnchorClick={(e) => {
             e.preventDefault();
             const lenis = window.__lenis;

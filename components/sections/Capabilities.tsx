@@ -17,17 +17,17 @@ interface Capability {
 const CAPABILITIES: readonly Capability[] = [
   {
     icon: "turning",
-    title: "CNC Turning",
+    title: "CNC Turning Live Tool",
     body:
       "Multi-axis turning centers producing complex rotational geometries with sub-thousandth tolerances. Bar fed and chucker capabilities up to 12 inches in diameter.",
-    tags: ["BAR FED", "CHUCKER", "MULTI-AXIS", 'UP TO 12"'],
+    tags: ["BAR FED", "CHUCKER", "LIVE TOOLS", "MULTI-AXIS", 'UP TO 12"'],
   },
   {
     icon: "milling",
     title: "CNC Milling",
     body:
-      "3, 4, and 5-axis milling for prismatic and contoured parts. From prototype to full production runs in steel, aluminum, titanium, and exotic alloys.",
-    tags: ["3-AXIS", "4-AXIS", "5-AXIS", "STEEL", "ALUMINUM", "TITANIUM"],
+      "4-axis milling for prismatic and contoured parts. From prototype to full production runs in steel, aluminum, titanium, and exotic alloys.",
+    tags: ["4-AXIS", "STEEL", "ALUMINUM", "TITANIUM"],
   },
   {
     icon: "grinding",

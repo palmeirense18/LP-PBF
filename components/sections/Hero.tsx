@@ -8,10 +8,9 @@ import { gsap, setupGsap } from "@/components/animations/gsap";
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
 
-  const desktopVideoRef = useRef<HTMLVideoElement>(null);
-  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const eyebrowRef = useRef<HTMLSpanElement>(null);
   const line1Ref = useRef<HTMLSpanElement>(null);
   const line2Ref = useRef<HTMLSpanElement>(null);
@@ -19,38 +18,71 @@ export default function Hero() {
   const ctasRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
 
+  // Detect viewport + reduced motion on mount; pick the right src.
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(mq.matches);
-    const onChange = () => setReduceMotion(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileMq = window.matchMedia("(max-width: 767px)");
+    setReduceMotion(motionMq.matches);
+    setVideoSrc(
+      mobileMq.matches ? "/hero/video-hero-loop-mobile.mp4" : "/hero/video-hero-loop.mp4"
+    );
+    const onMotionChange = () => setReduceMotion(motionMq.matches);
+    motionMq.addEventListener("change", onMotionChange);
+    return () => motionMq.removeEventListener("change", onMotionChange);
   }, []);
 
-  // Defensive autoplay: explicitly call .play() after mount; flag blocked autoplay.
+  // Silent autoplay maximization for iOS Safari.
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reduceMotion) return;
+    const video = videoRef.current;
+    if (!video) return;
 
-    const tryPlay = (video: HTMLVideoElement | null) => {
-      if (!video) return Promise.resolve("nop" as const);
+    let played = false;
+
+    const safePlay = () => {
+      if (played) return;
       video.muted = true;
       video.playsInline = true;
       const p = video.play();
-      return p && typeof p.then === "function"
-        ? p.then(() => "ok" as const)
-        : Promise.resolve("ok" as const);
+      if (p && typeof p.then === "function") {
+        p.then(() => {
+          played = true;
+        }).catch(() => {
+          /* still blocked — first-interaction listener will retry */
+        });
+      } else {
+        played = true;
+      }
     };
 
-    Promise.all([
-      tryPlay(desktopVideoRef.current).catch(() => "blocked" as const),
-      tryPlay(mobileVideoRef.current).catch(() => "blocked" as const),
-    ]).then((results) => {
-      const realResults = results.filter((r) => r !== "nop");
-      if (realResults.length > 0 && realResults.every((r) => r === "blocked")) {
-        setAutoplayBlocked(true);
+    if (video.readyState >= 3) {
+      safePlay();
+    } else {
+      video.addEventListener("canplay", safePlay, { once: true });
+    }
+
+    const onFirstInteraction = () => {
+      safePlay();
+      if (played) {
+        window.removeEventListener("touchstart", onFirstInteraction);
+        window.removeEventListener("scroll", onFirstInteraction);
+        window.removeEventListener("click", onFirstInteraction);
+        window.removeEventListener("keydown", onFirstInteraction);
       }
-    });
-  }, []);
+    };
+    window.addEventListener("touchstart", onFirstInteraction, { passive: true });
+    window.addEventListener("scroll", onFirstInteraction, { passive: true });
+    window.addEventListener("click", onFirstInteraction, { passive: true });
+    window.addEventListener("keydown", onFirstInteraction, { passive: true });
+
+    return () => {
+      video.removeEventListener("canplay", safePlay);
+      window.removeEventListener("touchstart", onFirstInteraction);
+      window.removeEventListener("scroll", onFirstInteraction);
+      window.removeEventListener("click", onFirstInteraction);
+      window.removeEventListener("keydown", onFirstInteraction);
+    };
+  }, [reduceMotion, videoSrc]);
 
   // Entrance choreography
   useEffect(() => {
@@ -95,63 +127,26 @@ export default function Hero() {
   return (
     <section ref={sectionRef} className="relative w-full h-screen bg-ink">
       <div className="relative h-full w-full overflow-hidden">
-        {/* Desktop / wide viewports */}
-        <video
-          ref={desktopVideoRef}
-          className="absolute inset-0 h-full w-full object-cover hidden md:block"
-          src="/hero/video-hero-loop.mp4"
-          autoPlay={!reduceMotion}
-          loop={!reduceMotion}
-          muted
-          playsInline
-          preload="auto"
-          poster="/hero/video-hero-poster.jpg"
-          aria-hidden
-          style={{ background: "#0A0A0A" }}
-        />
-        {/* Mobile / narrow viewports */}
-        <video
-          ref={mobileVideoRef}
-          className="absolute inset-0 h-full w-full object-cover md:hidden"
-          src="/hero/video-hero-loop-mobile.mp4"
-          autoPlay={!reduceMotion}
-          loop={!reduceMotion}
-          muted
-          playsInline
-          preload="auto"
-          poster="/hero/video-hero-poster.jpg"
-          aria-hidden
-          style={{ background: "#0A0A0A" }}
-        />
-
-        {/* Mobile-only tap-to-play fallback when autoplay is blocked. */}
-        {autoplayBlocked && !reduceMotion && (
-          <button
-            type="button"
-            onClick={() => {
-              const v = mobileVideoRef.current ?? desktopVideoRef.current;
-              if (!v) return;
-              v.muted = true;
-              v.playsInline = true;
-              v.play()
-                .then(() => setAutoplayBlocked(false))
-                .catch(() => {});
-            }}
-            aria-label="Tap to play hero animation"
-            className="absolute inset-0 z-[15] flex items-center justify-center bg-transparent cursor-pointer md:hidden"
-          >
-            <span
-              className="font-display uppercase text-bone bg-ink/70 backdrop-blur-sm px-5 py-3 rounded-sm pointer-events-none"
-              style={{ fontSize: "12px", letterSpacing: "0.32em" }}
-            >
-              ▶ TAP TO PLAY
-            </span>
-          </button>
+        {videoSrc && (
+          <video
+            ref={videoRef}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={videoSrc}
+            autoPlay={!reduceMotion}
+            loop={!reduceMotion}
+            muted
+            playsInline
+            {...({ "webkit-playsinline": "true" } as Record<string, string>)}
+            preload="auto"
+            poster="/hero/video-hero-poster.jpg"
+            aria-hidden
+            style={{ background: "#0A0A0A" }}
+          />
         )}
 
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-[20] hidden md:block"
+          className="pointer-events-none absolute inset-0 z-10 hidden md:block"
           style={{
             background:
               "linear-gradient(90deg, transparent 0%, transparent 32%, rgba(10,10,10,0.55) 58%, rgba(10,10,10,0.92) 100%)",
@@ -160,14 +155,14 @@ export default function Hero() {
 
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-[20] md:hidden"
+          className="pointer-events-none absolute inset-0 z-10 md:hidden"
           style={{
             background:
               "linear-gradient(180deg, transparent 0%, transparent 40%, rgba(10,10,10,0.55) 70%, rgba(10,10,10,0.92) 100%)",
           }}
         />
 
-        <div className="absolute inset-0 z-30 flex h-full w-full items-center justify-center md:left-auto md:right-0 md:w-[52%] md:justify-start">
+        <div className="absolute inset-0 z-20 flex h-full w-full items-center justify-center md:left-auto md:right-0 md:w-[52%] md:justify-start">
           <div className="w-full max-w-xl px-6 text-center md:pl-12 md:pr-8 md:text-left lg:pr-12">
             <span
               ref={eyebrowRef}
@@ -245,7 +240,7 @@ export default function Hero() {
           </span>
         </div>
 
-        <div ref={indicatorRef}>
+        <div ref={indicatorRef} className="relative z-30">
           <ScrollIndicator />
         </div>
       </div>

@@ -19,7 +19,7 @@ export function useAnchorScroll() {
 
         const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const lenis = window.__lenis;
-        const offset = -72;
+        const offset = -96;
 
         if (lenis) {
           lenis.scrollTo(target, {

@@ -31,7 +31,12 @@ for (let i = 0; i < data.length; i += channels) {
 }
 
 await sharp(data, { raw: { width, height, channels } })
+  .trim({
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+    threshold: 5,
+  })
   .png({ compressionLevel: 9 })
   .toFile(OUT_ICON);
 
-console.log(`✓ Wrote ${OUT_ICON} (${width}×${height})`);
+const finalMeta = await sharp(OUT_ICON).metadata();
+console.log(`✓ Wrote ${OUT_ICON} (${finalMeta.width}×${finalMeta.height}, trimmed)`);

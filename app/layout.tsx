@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     "precision machining",
     "New Jersey",
     "aerospace machining",
-    "AS9100",
-    "ISO 9001",
-    "5-axis milling",
+    "4-axis machining",
+    "live tool turning",
+    "CNC milling",
     "CNC turning",
   ],
   openGraph: {

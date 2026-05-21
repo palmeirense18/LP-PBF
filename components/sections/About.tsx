@@ -11,7 +11,7 @@ const HEADING_LINE_2 = "Trusted Worldwide";
 
 const PARAGRAPHS = [
   "PBFMACHINE is a family-owned precision machining shop operating out of New Jersey since our founding. We exist for one reason: to manufacture parts that meet the unforgiving tolerances modern industry demands.",
-  "Our floor combines decades of operator experience with the latest multi-axis CNC platforms, full inspection laboratories, and a quality system built around AS9100 and ISO 9001 disciplines. Every part that ships carries our name.",
+  "Our floor combines decades of operator experience with multi-axis CNC platforms, full in-house inspection, and disciplined process controls developed over decades of shop-floor practice. Every part that ships carries our name.",
 ];
 
 const CLOSE_PARAGRAPH =
@@ -92,14 +92,14 @@ const CALLOUTS: CalloutSpec[] = [
     label: { bottom: 0, right: 0 },
     labelAlign: "right",
   },
-  // C — CERTIFIED / AS9100 · ISO 9001
+  // C — INSPECTION / CMM-VERIFIED
   // Wrapper at top 28% / left 48% — upper-middle interior, sits BELOW the
   // heading-bleed zone. Label at top-left, connector points down-right toward
   // the spindle/work area.
   {
-    id: "certified",
-    eyebrow: "CERTIFIED",
-    value: "AS9100 · ISO 9001",
+    id: "inspection",
+    eyebrow: "INSPECTION",
+    value: "CMM-VERIFIED",
     wrapper: {
       top: "28%",
       left: "48%",
@@ -574,16 +574,16 @@ export default function About() {
           />
         </div>
 
-        {/* Cert badges */}
+        {/* Capability badges */}
         <div className="mt-16 flex flex-wrap justify-center gap-3">
           <span data-about="badge" className="inline-flex">
-            <CertBadge label="AS9100" detail="AEROSPACE" tone="bone" />
+            <CertBadge label="MULTI-AXIS" detail="CAPABILITY" tone="bone" />
           </span>
           <span data-about="badge" className="inline-flex">
-            <CertBadge label="ISO 9001" detail="QUALITY" tone="bone" />
+            <CertBadge label="DOMESTIC" detail="SOURCING" tone="bone" />
           </span>
           <span data-about="badge" className="inline-flex">
-            <CertBadge label="ITAR" detail="REGISTERED" tone="bone" />
+            <CertBadge label="CMM" detail="VERIFIED" tone="bone" />
           </span>
         </div>
       </div>

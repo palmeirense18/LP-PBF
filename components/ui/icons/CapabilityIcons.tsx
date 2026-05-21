@@ -38,185 +38,170 @@ const svgProps = {
   "aria-hidden": true,
 };
 
+/* CNC lathe — side view silhouette */
 export function TurningIcon() {
   return (
     <svg {...svgProps}>
-      {/* Tailstock support (right side) */}
-      <line x1="56" y1="22" x2="56" y2="42" />
-      <line x1="54" y1="22" x2="58" y2="22" />
-      <line x1="54" y1="42" x2="58" y2="42" />
+      {/* Floor line */}
+      <line
+        x1="2"
+        y1="58"
+        x2="62"
+        y2="58"
+        stroke={SILVER}
+        strokeOpacity="0.4"
+        strokeWidth={1}
+      />
 
-      {/* Workpiece cylinder */}
-      <line x1="24" y1="28" x2="54" y2="28" />
-      <line x1="24" y1="36" x2="54" y2="36" />
-      <line x1="54" y1="28" x2="54" y2="36" />
+      {/* Bed */}
+      <rect x="4" y="44" width="56" height="6" />
 
-      {/* Centerline tick marks (silver, no animation) */}
-      <line x1="30" y1="31" x2="30" y2="33" stroke={SILVER} strokeOpacity="0.3" />
-      <line x1="38" y1="31" x2="38" y2="33" stroke={SILVER} strokeOpacity="0.3" />
-      <line x1="46" y1="31" x2="46" y2="33" stroke={SILVER} strokeOpacity="0.3" />
+      {/* Headstock */}
+      <rect x="6" y="22" width="14" height="22" />
 
-      {/* Headstock chuck — rotates */}
+      {/* Workpiece cylinder (between chuck and tailstock) */}
+      <line x1="26" y1="30" x2="48" y2="30" />
+      <line x1="26" y1="36" x2="48" y2="36" />
+
+      {/* Tailstock */}
+      <rect x="48" y="26" width="8" height="14" />
+
+      {/* Chuck — rotates */}
       <g
         className="cap-anim cap-spin-chuck"
-        style={animStyle("cap-spin-chuck", "3.6s", "linear")}
+        style={{
+          ...animStyle("cap-spin-chuck", "3.6s", "linear"),
+          transformOrigin: "24px 33px",
+          transformBox: "view-box",
+        }}
       >
-        <circle cx="16" cy="32" r="8" />
-        {/* radial slots at 0°, 120°, 240° */}
-        <line x1="16" y1="32" x2="24" y2="32" />
-        <line x1="16" y1="32" x2="12" y2="38.928" />
-        <line x1="16" y1="32" x2="12" y2="25.072" />
-        {/* Hub dot */}
-        <circle cx="16" cy="32" r="1.2" fill="currentColor" stroke="none" />
+        <circle cx="24" cy="33" r="5" />
+        {/* radial slots */}
+        <line x1="24" y1="33" x2="29" y2="33" />
+        <line x1="24" y1="33" x2="21.5" y2="37.33" />
+        <line x1="24" y1="33" x2="21.5" y2="28.67" />
+        {/* hub */}
+        <circle cx="24" cy="33" r="1" fill="currentColor" stroke="none" />
       </g>
 
-      {/* Headstock body (static) */}
-      <line x1="6" y1="22" x2="6" y2="42" />
-      <line x1="6" y1="22" x2="10" y2="22" />
-      <line x1="6" y1="42" x2="10" y2="42" />
-
-      {/* Tool post (static vertical post) */}
-      <line x1="42" y1="6" x2="42" y2="14" />
-
-      {/* Tool tip — bobs vertically */}
+      {/* Tool turret on top — vertical bob */}
       <g
         className="cap-anim cap-tool-y"
         style={animStyle("cap-tool-y", "1.8s", "ease-in-out")}
       >
-        <path d="M38 14 L46 14 L42 22 Z" fill="currentColor" stroke="currentColor" />
+        {/* tool post */}
+        <line x1="38" y1="18" x2="38" y2="26" />
+        {/* turret triangle pointing down */}
+        <path
+          d="M33 10 L43 10 L38 18 Z"
+          fill="currentColor"
+          stroke="currentColor"
+        />
       </g>
     </svg>
   );
 }
 
+/* Vertical mill — side view silhouette */
 export function MillingIcon() {
   return (
     <svg {...svgProps}>
-      {/* Workpiece (static) */}
-      <rect x="12" y="42" width="40" height="12" />
+      {/* Floor line */}
+      <line
+        x1="2"
+        y1="58"
+        x2="62"
+        y2="58"
+        stroke={SILVER}
+        strokeOpacity="0.4"
+        strokeWidth={1}
+      />
 
-      {/* Spindle housing + end mill — rotates around (32,32) counter-clockwise */}
+      {/* Base */}
+      <rect x="6" y="48" width="52" height="6" />
+
+      {/* Table */}
+      <rect x="12" y="42" width="40" height="6" />
+
+      {/* Workpiece */}
+      <rect x="22" y="36" width="20" height="6" />
+
+      {/* Column (left) */}
+      <rect x="6" y="6" width="12" height="42" />
+
+      {/* Spindle head (overhang from column) */}
+      <rect x="18" y="14" width="22" height="8" />
+
+      {/* Spindle / cutter — plunges down on hover */}
       <g
-        className="cap-anim cap-spin-mill"
-        style={{
-          ...animStyle("cap-spin-mill", "2.4s", "linear"),
-          transformOrigin: "32px 32px",
-          transformBox: "view-box",
-        }}
+        className="cap-anim cap-spindle-y"
+        style={animStyle("cap-spindle-y", "1.8s", "ease-in-out")}
       >
-        {/* Spindle housing — thicker stroke */}
-        <rect x="28" y="6" width="8" height="16" strokeWidth={2} />
-        {/* End mill body */}
-        <line x1="30" y1="22" x2="30" y2="38" />
-        <line x1="34" y1="22" x2="34" y2="38" />
-        <line x1="30" y1="38" x2="34" y2="38" />
-        {/* Flute mark */}
-        <line x1="29" y1="36" x2="35" y2="36" />
+        {/* spindle quill */}
+        <line x1="29" y1="22" x2="29" y2="30" strokeWidth={2} />
+        <line x1="33" y1="22" x2="33" y2="30" strokeWidth={2} />
+        {/* cutter tip */}
+        <line x1="29" y1="30" x2="33" y2="30" />
+        <line x1="30" y1="30" x2="30" y2="34" />
+        <line x1="32" y1="30" x2="32" y2="34" />
       </g>
-
-      {/* Traversing tick on top edge of workpiece */}
-      <g
-        className="cap-anim cap-traverse-x"
-        style={animStyle(
-          "cap-traverse-x",
-          "2.6s",
-          "ease-in-out",
-          "infinite",
-          "alternate"
-        )}
-      >
-        <line x1="14" y1="40" x2="14" y2="44" strokeWidth={2} />
-      </g>
-
-      {/* X-axis indicator label (Orbitron, royal) */}
-      <text
-        x="32"
-        y="62"
-        textAnchor="middle"
-        fontFamily="var(--font-orbitron), sans-serif"
-        fontSize="6"
-        fontWeight={400}
-        fill="currentColor"
-        stroke="none"
-      >
-        X
-      </text>
-      {/* X-axis arrow */}
-      <line x1="14" y1="58" x2="50" y2="58" />
-      <polyline points="17,56 14,58 17,60" />
-      <polyline points="47,56 50,58 47,60" />
     </svg>
   );
 }
 
+/* Cylindrical grinder — side view silhouette */
 export function GrindingIcon() {
-  const sparkDelays = ["0s", "0.12s", "0.24s", "0.36s", "0.48s"];
-  const sparks: Array<{ x1: number; y1: number; x2: number; y2: number }> = [
-    { x1: 28, y1: 40, x2: 26, y2: 44 },
-    { x1: 30, y1: 41, x2: 29, y2: 46 },
-    { x1: 32, y1: 41, x2: 32, y2: 46 },
-    { x1: 34, y1: 41, x2: 35, y2: 46 },
-    { x1: 36, y1: 40, x2: 38, y2: 44 },
-  ];
-
   return (
     <svg {...svgProps}>
-      {/* Workpiece */}
-      <rect x="12" y="42" width="40" height="12" />
+      {/* Floor line */}
+      <line
+        x1="2"
+        y1="58"
+        x2="62"
+        y2="58"
+        stroke={SILVER}
+        strokeOpacity="0.4"
+        strokeWidth={1}
+      />
 
-      {/* Contact line strokes */}
-      <line x1="24" y1="42" x2="24" y2="44" stroke={SILVER} strokeOpacity="0.5" />
-      <line x1="40" y1="42" x2="40" y2="44" stroke={SILVER} strokeOpacity="0.5" />
+      {/* Bed */}
+      <rect x="4" y="46" width="56" height="6" />
 
-      {/* Grinding wheel — rotates around (32, 26) */}
+      {/* Workhead (left) */}
+      <rect x="6" y="36" width="10" height="10" />
+
+      {/* Workpiece cylinder */}
+      <line x1="16" y1="38" x2="48" y2="38" />
+      <line x1="16" y1="44" x2="48" y2="44" />
+
+      {/* Tailstock (right) */}
+      <rect x="48" y="34" width="8" height="12" />
+
+      {/* Wheelhead block (above) */}
+      <rect x="22" y="6" width="20" height="8" />
+
+      {/* Wheel spindle stem */}
+      <line x1="32" y1="14" x2="32" y2="20" />
+
+      {/* Grinding wheel — rotates around (32, 28) */}
       <g
         className="cap-anim cap-spin-wheel"
         style={{
           ...animStyle("cap-spin-wheel", "1.6s", "linear"),
-          transformOrigin: "32px 26px",
+          transformOrigin: "32px 28px",
           transformBox: "view-box",
         }}
       >
-        {/* Outer rim */}
-        <circle cx="32" cy="26" r="14" />
-        {/* Hub */}
-        <circle cx="32" cy="26" r="4" />
-        {/* 8 abrasive marks between hub and rim */}
-        {Array.from({ length: 8 }).map((_, i) => {
-          const angle = (i * 360) / 8;
-          const rad = (angle * Math.PI) / 180;
-          const x1 = 32 + Math.cos(rad) * 6;
-          const y1 = 26 + Math.sin(rad) * 6;
-          const x2 = 32 + Math.cos(rad) * 12;
-          const y2 = 26 + Math.sin(rad) * 12;
-          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />;
-        })}
+        {/* rim */}
+        <circle cx="32" cy="28" r="8" />
+        {/* hub */}
+        <circle cx="32" cy="28" r="2" />
+        {/* crosshair spokes */}
+        <line x1="32" y1="22" x2="32" y2="34" />
+        <line x1="26" y1="28" x2="38" y2="28" />
+        <line x1="27.76" y1="23.76" x2="36.24" y2="32.24" />
+        <line x1="27.76" y1="32.24" x2="36.24" y2="23.76" />
       </g>
-
-      {/* Sparks */}
-      {sparks.map((s, i) => (
-        <g
-          key={i}
-          className="cap-anim cap-spark"
-          style={animStyle(
-            "cap-spark",
-            "0.9s",
-            "ease-in-out",
-            "infinite",
-            "normal",
-            sparkDelays[i]
-          )}
-        >
-          <line
-            x1={s.x1}
-            y1={s.y1}
-            x2={s.x2}
-            y2={s.y2}
-            strokeWidth={1}
-            stroke="currentColor"
-          />
-        </g>
-      ))}
     </svg>
   );
 }

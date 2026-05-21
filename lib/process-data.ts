@@ -40,6 +40,6 @@ export const PROCESS: readonly ProcessStep[] = [
     index: "05",
     phase: "FULFILLMENT",
     title: "Delivery",
-    body: "On-time, packaged, and shipped to your specifications.",
+    body: "Packaged and shipped to your specifications, with lead times agreed at quote.",
   },
 ] as const;
