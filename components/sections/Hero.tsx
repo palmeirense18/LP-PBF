@@ -24,7 +24,7 @@ export default function Hero() {
     const mobileMq = window.matchMedia("(max-width: 767px)");
     setReduceMotion(motionMq.matches);
     setVideoSrc(
-      mobileMq.matches ? "/hero/video-hero-loop-mobile.mp4" : "/hero/video-hero-loop.mp4"
+      mobileMq.matches ? "/hero/video-hero-loop-mobile-v2.mp4" : "/hero/video-hero-loop-v2.mp4"
     );
     const onMotionChange = () => setReduceMotion(motionMq.matches);
     motionMq.addEventListener("change", onMotionChange);
@@ -138,7 +138,7 @@ export default function Hero() {
             playsInline
             {...({ "webkit-playsinline": "true" } as Record<string, string>)}
             preload="auto"
-            poster="/hero/video-hero-poster.jpg"
+            poster="/hero/video-hero-poster-v2.jpg"
             aria-hidden
             style={{ background: "#0A0A0A" }}
           />
