@@ -3,6 +3,7 @@ import StatsStrip from "@/components/sections/StatsStrip";
 import Capabilities from "@/components/sections/Capabilities";
 import Equipment from "@/components/sections/Equipment";
 import Industries from "@/components/sections/Industries";
+import WhyPbf from "@/components/sections/WhyPbf";
 import Process from "@/components/sections/Process";
 import About from "@/components/sections/About";
 import Contact from "@/components/sections/Contact";
@@ -17,6 +18,7 @@ export default function Home() {
         <Capabilities />
         <Equipment />
         <Industries />
+        <WhyPbf />
         <Process />
         <About />
         <Contact />

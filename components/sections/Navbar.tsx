@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: "Capabilities", href: "#capabilities" },
   { label: "Equipment", href: "#equipment" },
   { label: "Industries", href: "#industries" },
+  { label: "Why PBF", href: "#why" },
   { label: "Process", href: "#process" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
