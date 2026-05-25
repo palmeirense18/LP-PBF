@@ -38,19 +38,24 @@ interface CalloutSpec {
   // Label pill position within the wrapper
   label: React.CSSProperties;
   labelAlign: "left" | "right";
+  // Optional overrides for the value text (e.g. allow wrapping for longer copy)
+  valueStyle?: React.CSSProperties;
 }
 
 // Callouts sit ENTIRELY within the photo's bounding box, in interior positions
 // that don't intersect the heading bleed zone (top edge ~60px) or the body text
 // column (cols 8-12, outside the photo's cols 2-7).
 const CALLOUTS: CalloutSpec[] = [
-  // A — OPERATING / 40+ YEARS
+  // A — 40+ YEARS OF MACHINING EXPERIENCE
   // Wrapper at top 38% / left 18% — mid-left interior. Label at top-right of
-  // wrapper, connector points down-left into the chuck/spindle area.
+  // wrapper, connector points down-left into the chuck/spindle area. The full
+  // phrase replaces the prior "OPERATING / 40+ YEARS" two-tier badge, so the
+  // eyebrow is dropped and the value is allowed to wrap.
   {
     id: "operating",
-    eyebrow: "OPERATING",
-    value: "40+ YEARS",
+    eyebrow: "",
+    value: "40+ YEARS OF MACHINING EXPERIENCE",
+    valueStyle: { whiteSpace: "normal", maxWidth: "160px" },
     wrapper: {
       top: "38%",
       left: "18%",
@@ -494,22 +499,25 @@ export default function About() {
                       }`}
                       style={c.label}
                     >
-                      <span
-                        className="font-display uppercase text-bone"
-                        style={{
-                          fontSize: "9px",
-                          fontWeight: 400,
-                          letterSpacing: "0.42em",
-                        }}
-                      >
-                        {c.eyebrow}
-                      </span>
+                      {c.eyebrow ? (
+                        <span
+                          className="font-display uppercase text-bone"
+                          style={{
+                            fontSize: "9px",
+                            fontWeight: 400,
+                            letterSpacing: "0.42em",
+                          }}
+                        >
+                          {c.eyebrow}
+                        </span>
+                      ) : null}
                       <span
                         className="font-display font-bold uppercase text-bone"
                         style={{
                           fontSize: "14px",
                           lineHeight: 1.1,
                           whiteSpace: "nowrap",
+                          ...c.valueStyle,
                         }}
                       >
                         {c.value}
