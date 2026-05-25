@@ -166,6 +166,12 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
   // map a step index to its scroll position; updated automatically by GSAP on
   // refresh/resize since we hold the same instance.
   const triggerRef = useRef<{ start: number; end: number } | null>(null);
+  // True only while a click/keyboard-driven lenis.scrollTo is animating. While
+  // set, the ScrollTrigger snapTo no-ops so it cannot pull the position off the
+  // exact step target once the programmatic scroll settles. Organic (wheel/drag)
+  // scrolling never sets this, so snap behaves identically for the user.
+  const isProgrammaticScrollingRef = useRef(false);
+  const programmaticTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     setupGsap();
@@ -189,8 +195,14 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
           anticipatePin: 1,
           invalidateOnRefresh: true,
           snap: {
-            snapTo: (value) =>
-              Math.round(value * PROCESS.length) / PROCESS.length,
+            snapTo: (value) => {
+              // While a click/keyboard jump is animating, returning the incoming
+              // value unchanged means "snap to where we already are" = no
+              // correction, so the exact step target is never nudged. Organic
+              // scrolling leaves the flag false and snaps to the normal grid.
+              if (isProgrammaticScrollingRef.current) return value;
+              return Math.round(value * PROCESS.length) / PROCESS.length;
+            },
             duration: { min: 0.2, max: 0.6 },
             delay: 0.08,
             ease: "power2.inOut",
@@ -243,6 +255,11 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
 
       return () => {
         triggerRef.current = null;
+        if (programmaticTimeoutRef.current !== null) {
+          window.clearTimeout(programmaticTimeoutRef.current);
+          programmaticTimeoutRef.current = null;
+        }
+        isProgrammaticScrollingRef.current = false;
         tween.scrollTrigger?.kill();
         tween.kill();
       };
@@ -263,11 +280,38 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
     // past the pin enter / before the pin exit rather than on the boundary.
     const eps = 0.002;
     const frac = Math.min(1 - eps, Math.max(eps, i / denom));
-    const targetY = start + (end - start) * frac;
+    // Round to an integer pixel so the landing is exact and not re-rounded.
+    const targetY = Math.round(start + (end - start) * frac);
 
     const lenis = window.__lenis;
     if (lenis) {
-      lenis.scrollTo(targetY, { duration: 1.0, lock: false });
+      const DURATION = 0.9;
+      // Neutralize ScrollTrigger snap for the whole programmatic animation so it
+      // cannot drift the position once lenis.scrollTo settles on the target.
+      isProgrammaticScrollingRef.current = true;
+      if (programmaticTimeoutRef.current !== null) {
+        window.clearTimeout(programmaticTimeoutRef.current);
+        programmaticTimeoutRef.current = null;
+      }
+      const release = () => {
+        isProgrammaticScrollingRef.current = false;
+        if (programmaticTimeoutRef.current !== null) {
+          window.clearTimeout(programmaticTimeoutRef.current);
+          programmaticTimeoutRef.current = null;
+        }
+      };
+      lenis.scrollTo(targetY, {
+        duration: DURATION,
+        lock: true,
+        easing: (t: number) => 1 - Math.pow(1 - t, 3),
+        onComplete: release,
+      });
+      // Safety net: clear the flag even if onComplete never fires (e.g. the
+      // animation is interrupted), keeping organic snap from staying disabled.
+      programmaticTimeoutRef.current = window.setTimeout(
+        release,
+        DURATION * 1000 + 150
+      );
     } else {
       window.scrollTo({ top: targetY, behavior: "smooth" });
     }
