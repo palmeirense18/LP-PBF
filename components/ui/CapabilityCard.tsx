@@ -4,16 +4,14 @@ import { useEffect, useRef } from "react";
 import {
   TurningIcon,
   MillingIcon,
-  GrindingIcon,
 } from "@/components/ui/icons/CapabilityIcons";
 import { gsap, setupGsap } from "@/components/animations/gsap";
 
-export type CapabilityIconKey = "turning" | "milling" | "grinding";
+export type CapabilityIconKey = "turning" | "milling";
 
 const ICONS: Record<CapabilityIconKey, () => JSX.Element> = {
   turning: TurningIcon,
   milling: MillingIcon,
-  grinding: GrindingIcon,
 };
 
 export interface CapabilityRowProps {

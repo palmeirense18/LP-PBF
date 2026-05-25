@@ -100,11 +100,6 @@ h6 {
     transform: rotate(360deg);
   }
 }
-@keyframes cap-spin-wheel {
-  to {
-    transform: rotate(360deg);
-  }
-}
 @keyframes cap-tool-y {
   0% {
     transform: translateY(0);

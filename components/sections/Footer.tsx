@@ -13,7 +13,6 @@ const FOOTER_COLUMNS = [
     links: [
       { label: "CNC Turning", href: "#capabilities" },
       { label: "CNC Milling", href: "#capabilities" },
-      { label: "Precision Grinding", href: "#capabilities" },
       { label: "Equipment", href: "#equipment" },
       { label: "Inspection", href: "#process" },
     ],

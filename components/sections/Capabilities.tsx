@@ -29,13 +29,6 @@ const CAPABILITIES: readonly Capability[] = [
       "4-axis milling for prismatic and contoured parts. From prototype to full production runs in steel, aluminum, titanium, and exotic alloys.",
     tags: ["4-AXIS", "STEEL", "ALUMINUM", "TITANIUM"],
   },
-  {
-    icon: "grinding",
-    title: "Precision Grinding & Finishing",
-    body:
-      "Surface, cylindrical, and centerless grinding operations. Final inspection on CMM-verified equipment to guarantee dimensional integrity.",
-    tags: ["SURFACE", "CYLINDRICAL", "CENTERLESS", "CMM-VERIFIED"],
-  },
 ] as const;
 
 export default function Capabilities() {
@@ -108,7 +101,7 @@ export default function Capabilities() {
             data-cap-head
             className="mt-4 max-w-md font-body text-[18px] text-mediumGray"
           >
-            Three disciplines. One standard.
+            Two disciplines. One standard.
           </p>
         </div>
 
