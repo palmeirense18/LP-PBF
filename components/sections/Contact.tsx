@@ -15,8 +15,8 @@ const INFO = [
   {
     icon: "phone" as const,
     label: "Phone",
-    value: "+1 (973) 555-0142",
-    href: "tel:+19735550142",
+    value: "(862) 291-9548",
+    href: "tel:+18622919548",
   },
   {
     icon: "email" as const,
