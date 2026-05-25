@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, setupGsap } from "@/components/animations/gsap";
 import { useInViewOnce } from "@/lib/useInViewOnce";
 import { PROCESS } from "@/lib/process-data";
@@ -162,6 +162,10 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
   const progressFillRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const labelRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  // Live start/end (px) of the pinned ScrollTrigger range. Read on click to
+  // map a step index to its scroll position; updated automatically by GSAP on
+  // refresh/resize since we hold the same instance.
+  const triggerRef = useRef<{ start: number; end: number } | null>(null);
 
   useEffect(() => {
     setupGsap();
@@ -222,6 +226,9 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
         },
       });
 
+      // Hold the live ScrollTrigger so clicks can read its current start/end.
+      triggerRef.current = tween.scrollTrigger ?? null;
+
       // Initialize step 0 as active
       requestAnimationFrame(() => {
         dotRefs.current.forEach((el, idx) => {
@@ -235,6 +242,7 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
       });
 
       return () => {
+        triggerRef.current = null;
         tween.scrollTrigger?.kill();
         tween.kill();
       };
@@ -242,6 +250,28 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
 
     return () => ctx.revert();
   }, [setActiveIndex]);
+
+  // Jump to a step by scrolling to the scrollY that corresponds to that step's
+  // progress point inside the pinned range. The scroll-scrub then drives the
+  // slide naturally — the pin/scrub/snap logic is untouched.
+  const handleStepClick = useCallback((i: number) => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const { start, end } = trigger;
+    const denom = Math.max(1, PROCESS.length - 1);
+    // Nudge fractions a hair inside the range so the first/last steps land just
+    // past the pin enter / before the pin exit rather than on the boundary.
+    const eps = 0.002;
+    const frac = Math.min(1 - eps, Math.max(eps, i / denom));
+    const targetY = start + (end - start) * frac;
+
+    const lenis = window.__lenis;
+    if (lenis) {
+      lenis.scrollTo(targetY, { duration: 1.0, lock: false });
+    } else {
+      window.scrollTo({ top: targetY, behavior: "smooth" });
+    }
+  }, []);
 
   return (
     <div
@@ -283,6 +313,7 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
           fillRef={progressFillRef}
           dotRefs={dotRefs}
           labelRefs={labelRefs}
+          onStepClick={handleStepClick}
         />
       </div>
     </div>

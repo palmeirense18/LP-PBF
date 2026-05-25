@@ -8,6 +8,7 @@ interface ProcessProgressProps {
   fillRef: RefObject<HTMLDivElement>;
   dotRefs: MutableRefObject<Array<HTMLSpanElement | null>>;
   labelRefs: MutableRefObject<Array<HTMLSpanElement | null>>;
+  onStepClick?: (i: number) => void;
 }
 
 export default function ProcessProgress({
@@ -15,6 +16,7 @@ export default function ProcessProgress({
   fillRef,
   dotRefs,
   labelRefs,
+  onStepClick,
 }: ProcessProgressProps) {
   const total = PROCESS.length;
 
@@ -43,14 +45,28 @@ export default function ProcessProgress({
           }}
         />
 
-        {/* Dot markers + labels */}
+        {/* Dot markers + labels — each wrapped in a zero-styled button so the
+            indicators are clickable/keyboard-accessible. The button resets all
+            browser chrome (no background, border, padding) and inherits the
+            site's cursor handling, so it is visually identical to the prior
+            decorative markers at rest. */}
         {PROCESS.map((step, i) => {
           const pos = (i / (total - 1)) * 100;
           return (
-            <div
+            <button
               key={step.id}
+              type="button"
+              onClick={() => onStepClick?.(i)}
+              aria-label={`Go to step ${i + 1}`}
               className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${pos}%` }}
+              style={{
+                appearance: "none",
+                background: "none",
+                border: 0,
+                padding: 0,
+                margin: 0,
+                left: `${pos}%`,
+              }}
             >
               <span
                 ref={(el) => {
@@ -78,7 +94,7 @@ export default function ProcessProgress({
                   outline: "2px solid #0A0A0A",
                 }}
               />
-            </div>
+            </button>
           );
         })}
       </div>
