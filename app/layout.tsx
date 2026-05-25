@@ -66,7 +66,7 @@ const STRUCTURED_DATA = {
     "Precision CNC machining shop in New Jersey. High-tolerance parts for aerospace, defense, automotive, medical, and industrial sectors.",
   url: SITE_URL,
   telephone: "+1-862-291-9548",
-  email: "info@pbfmachine.com",
+  email: "pbf@pbfmachine.com",
   address: {
     "@type": "PostalAddress",
     streetAddress: "615 Pennsylvania Ave",

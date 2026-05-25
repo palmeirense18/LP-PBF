@@ -179,7 +179,7 @@ export default function MobileMenu({
             }}
             className="mt-10 flex flex-col gap-1 border-t border-silver/20 pt-6 font-body text-[13px] text-silver"
           >
-            <span>info@pbfmachine.com</span>
+            <span>pbf@pbfmachine.com</span>
             <span>(862) 291-9548</span>
             <span>Elizabeth, NJ · USA</span>
           </motion.div>

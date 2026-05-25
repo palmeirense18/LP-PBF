@@ -84,7 +84,7 @@ export default function ContactForm() {
     ]
       .filter((l) => l !== null)
       .join("\n");
-    return `mailto:info@pbfmachine.com?subject=${encodeURIComponent(
+    return `mailto:pbf@pbfmachine.com?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(lines)}`;
   }, [state]);
@@ -308,7 +308,7 @@ export default function ContactForm() {
                 className="underline"
                 style={{ color: "#6FA0E6" }}
               >
-                info@pbfmachine.com
+                pbf@pbfmachine.com
               </a>
               .
             </div>

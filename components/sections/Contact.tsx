@@ -21,8 +21,8 @@ const INFO = [
   {
     icon: "email" as const,
     label: "Email",
-    value: "info@pbfmachine.com",
-    href: "mailto:info@pbfmachine.com",
+    value: "pbf@pbfmachine.com",
+    href: "mailto:pbf@pbfmachine.com",
   },
 ];
 

@@ -35,7 +35,7 @@ const FOOTER_COLUMNS = [
       { label: "Process", href: "#process" },
       { label: "Contact", href: "#contact" },
       { label: "Compliance", href: "#about" },
-      { label: "Careers", href: "mailto:careers@pbfmachine.com" },
+      { label: "Careers", href: "mailto:pbf@pbfmachine.com" },
     ],
   },
 ] as const;
@@ -198,11 +198,11 @@ export default function Footer() {
               ELIZABETH, NJ 07201
             </span>
             <a
-              href="mailto:info@pbfmachine.com"
+              href="mailto:pbf@pbfmachine.com"
               data-cursor="hover"
               className="mt-2 text-bone transition-colors duration-200 hover:text-royal"
             >
-              info@pbfmachine.com
+              pbf@pbfmachine.com
             </a>
           </div>
 
