@@ -26,20 +26,11 @@ const STATS: Stat[] = [
     display: "24/7",
     label: "Production Capacity",
   },
-  {
-    id: "cert",
-    kind: "count",
-    from: 0,
-    to: 9100,
-    prefix: "AS",
-    decimals: 0,
-    formatNoCommas: true,
-    label: "Quality Certified",
-  },
 ];
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
-const COLUMN_POSITIONS = [25, 50, 75] as const;
+// Dividers sit between the three items: 1/3 and 2/3 of the strip.
+const DIVIDER_POSITIONS = [100 / 3, 200 / 3] as const;
 
 export default function StatsStrip() {
   const { ref, inView } = useInViewOnce<HTMLElement>(0.6);
@@ -84,22 +75,24 @@ export default function StatsStrip() {
         style={horizLineStyle(0)}
       />
 
-      <div className="relative mx-auto max-w-[1440px] px-6 md:px-10">
-        <div className="relative grid grid-cols-2 md:grid-cols-4">
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-mediumGray/15 md:hidden"
-          />
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-mediumGray/15 md:hidden"
-          />
-
-          {COLUMN_POSITIONS.map((pos) => (
+      <div className="relative mx-auto max-w-[1100px] px-6 md:px-10">
+        <div className="relative grid grid-cols-1 md:grid-cols-3">
+          {/* Mobile: stacked items separated by horizontal hairlines. */}
+          {DIVIDER_POSITIONS.map((pos) => (
             <span
-              key={pos}
+              key={`h-${pos}`}
               aria-hidden
-              className="pointer-events-none absolute top-0 hidden h-full w-px -translate-x-1/2 bg-mediumGray/15 md:block"
+              className="pointer-events-none absolute left-0 h-px w-full bg-mediumGray/15 md:hidden"
+              style={{ top: `${pos}%` }}
+            />
+          ))}
+
+          {/* Desktop: three columns separated by Royal Blue vertical dividers. */}
+          {DIVIDER_POSITIONS.map((pos) => (
+            <span
+              key={`v-${pos}`}
+              aria-hidden
+              className="pointer-events-none absolute top-0 hidden h-full w-px -translate-x-1/2 bg-royal/40 md:block"
               style={{
                 left: `${pos}%`,
                 ...vertLineStyle(200),

@@ -25,13 +25,13 @@ export default function Logo({
 
       <span className="flex flex-col leading-none">
         <span
-          className="font-display font-bold uppercase tracking-[0.18em] text-bone md:text-[26px]"
+          className="font-display font-bold uppercase tracking-[0.2em] whitespace-nowrap text-bone md:text-[26px]"
           style={{ fontSize: 22 }}
         >
           PBFMACHINE
         </span>
         <span
-          className="hidden font-display uppercase tracking-[0.4em] text-silver md:mt-1.5 lg:inline"
+          className="hidden font-display uppercase tracking-[0.3em] text-silver md:mt-1.5 lg:inline"
           style={{ fontSize: 9, fontWeight: 400 }}
         >
           PRECISION

@@ -30,7 +30,7 @@ export default function NavLink({
         textShadow: active ? "0 0 12px rgba(43,91,166,0.4)" : undefined,
       }}
     >
-      <span className="relative inline-block py-1.5">{label}</span>
+      <span className="relative inline-block whitespace-nowrap py-1.5">{label}</span>
       <span
         aria-hidden
         className={cn(

@@ -3,6 +3,7 @@ import { Orbitron, Roboto } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import Cursor from "@/components/ui/Cursor";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 import Navbar from "@/components/sections/Navbar";
 
 const orbitron = Orbitron({
@@ -98,6 +99,7 @@ export default function RootLayout({
           {children}
         </SmoothScroll>
         <Cursor />
+        <ScrollToTop />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

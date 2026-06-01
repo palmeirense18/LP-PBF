@@ -136,9 +136,9 @@ export default function Navbar() {
 
           <nav
             aria-label="Primary"
-            className="hidden items-center gap-8 md:flex"
+            className="hidden items-center gap-8 xl:flex 2xl:gap-10"
           >
-            {NAV_ITEMS.map((item) => (
+            {NAV_ITEMS.filter((item) => item.href !== "#contact").map((item) => (
               <NavLink
                 key={item.href}
                 href={item.href}
@@ -150,7 +150,7 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center">
-            <div className="hidden md:block">
+            <div className="hidden xl:block">
               <Button
                 variant="primary"
                 size="sm"
@@ -161,7 +161,7 @@ export default function Navbar() {
                 Contact Us
               </Button>
             </div>
-            <div className="md:hidden">
+            <div className="xl:hidden">
               <Hamburger
                 open={menuOpen}
                 onClick={() => setMenuOpen((v) => !v)}
