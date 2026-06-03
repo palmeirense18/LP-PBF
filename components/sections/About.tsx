@@ -305,7 +305,7 @@ export default function About() {
       ref={sectionRef}
       id="about"
       aria-labelledby="about-heading"
-      className="relative w-full overflow-hidden bg-[#1B57C9] py-32 md:py-44"
+      className="relative w-full overflow-hidden bg-navy py-32 md:py-44"
     >
       {/* Vertical decorative text — far-left edge, md+ only */}
       <div

@@ -95,7 +95,7 @@ export default function Industries() {
     <section
       id="industries"
       aria-labelledby="industries-heading"
-      className="relative w-full overflow-hidden bg-[#1B57C9] py-28 md:py-36"
+      className="relative w-full overflow-hidden bg-navy py-28 md:py-36"
     >
       {/* Topographic backdrop */}
       <div ref={backdropRef} className="absolute inset-0 z-0">

@@ -20,7 +20,7 @@ export default function Logo({
         <LogoMark size={56} withTile />
       </span>
       <span className="hidden md:block">
-        <LogoMark size={72} withTile />
+        <LogoMark size={80} withTile />
       </span>
 
       <span className="flex flex-col leading-none">

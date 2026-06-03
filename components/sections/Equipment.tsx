@@ -201,6 +201,7 @@ function PinnedVariant({ activeIndex, setActiveIndex }: PinnedVariantProps) {
           // Crossfade photos based on progress
           const scaled = p * SEQUENCE_LENGTH;
           photos.forEach((el, idx) => {
+            const isLast = idx === SEQUENCE_LENGTH - 1;
             const local = scaled - idx; // 0..1 within this slot, may go negative or >1
             let opacity = 0;
             let scale = 1.04;
@@ -215,11 +216,19 @@ function PinnedVariant({ activeIndex, setActiveIndex }: PinnedVariantProps) {
               opacity = 1;
               scale = 1;
             } else if (local < 1) {
-              const t = (local - 0.7) / 0.3; // 0..1
-              opacity = 1 - t;
-              scale = 1;
+              // Last photo has no successor — hold it steady instead of fading to black.
+              if (isLast) {
+                opacity = 1;
+                scale = 1;
+              } else {
+                const t = (local - 0.7) / 0.3; // 0..1
+                opacity = 1 - t;
+                scale = 1;
+              }
             } else {
-              opacity = 0;
+              // Beyond this slot's window: the last photo stays fully visible
+              // through to the pin release so the section never flashes black.
+              opacity = isLast ? 1 : 0;
               scale = 1;
             }
             // Parallax: -16 → +16 across the visible window
@@ -296,11 +305,24 @@ function PinnedVariant({ activeIndex, setActiveIndex }: PinnedVariantProps) {
         <div className="relative w-[58%] overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center p-6 md:p-10">
             <div
-              className="relative aspect-[3/2] max-h-full w-full overflow-hidden"
+              className="relative aspect-[3/2] max-h-full w-full overflow-hidden bg-ink"
               style={{
                 filter: "contrast(1.06) saturate(0.85) brightness(0.92)",
               }}
             >
+              {/* Defense-in-depth base layer: the last machine, always present
+                  behind the crossfade stack so a sub-frame gap during fast
+                  scroll/resize never flashes pure black. */}
+              <div aria-hidden className="absolute inset-0">
+                <Image
+                  src={EQUIPMENT[SEQUENCE_LENGTH - 1].image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 58vw, 100vw"
+                  quality={88}
+                  className="object-cover"
+                />
+              </div>
               {EQUIPMENT.map((m, i) => {
                 const isStudio = m.id === "vm04";
                 return (

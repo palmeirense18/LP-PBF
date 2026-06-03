@@ -70,7 +70,7 @@ export default function Capabilities() {
     <section
       id="capabilities"
       aria-labelledby="capabilities-heading"
-      className="relative w-full bg-[#1B57C9] py-28 md:py-36"
+      className="relative w-full bg-navy py-28 md:py-36"
     >
       <div ref={ref} className="mx-auto max-w-[1440px] px-6 md:px-10">
         {/* Header block */}
