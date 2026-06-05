@@ -93,7 +93,7 @@ export const EQUIPMENT: readonly Equipment[] = [
     image: "/machines/06-wh04-precision-workholding.jpg",
     alt: "Precision spindle face with a blue collet workholding system installed.",
     specs: [
-      { label: "Collet System", value: "Hardinge 5C compatible" },
+      { label: "Collet System", value: "Hardinge 5C compatible and 8-inch chuck" },
       { label: "Concentricity", value: '±0.00015"' },
       { label: "Grip Force", value: "6,500 lbf" },
       { label: "Max RPM", value: "8,000" },

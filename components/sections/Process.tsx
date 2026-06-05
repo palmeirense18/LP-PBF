@@ -1,36 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { gsap, setupGsap } from "@/components/animations/gsap";
+import { animate, motion, useMotionValue, type PanInfo } from "framer-motion";
+import { gsap, ScrollTrigger, setupGsap } from "@/components/animations/gsap";
 import { useInViewOnce } from "@/lib/useInViewOnce";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { PROCESS } from "@/lib/process-data";
 import ProcessStep from "@/components/ui/ProcessStep";
 import ProcessProgress from "@/components/ui/ProcessProgress";
 
-const STEP_VH = 200;
+// Slide width as a fraction of the carousel viewport — full width, so exactly
+// one step card is visible (and centered) at a time on every breakpoint.
+const DESKTOP_SLIDE_FRACTION = 1;
 
 export default function Process() {
-  const [mountMode, setMountMode] = useState<"pinned" | "stacked" | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  // Decide variant after first paint
-  useEffect(() => {
-    const decide = () => {
-      const desktop = window.matchMedia("(min-width: 768px)").matches;
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      setMountMode(desktop && !reduced ? "pinned" : "stacked");
-    };
-    decide();
-    const mqDesktop = window.matchMedia("(min-width: 768px)");
-    const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    mqDesktop.addEventListener("change", decide);
-    mqReduced.addEventListener("change", decide);
-    return () => {
-      mqDesktop.removeEventListener("change", decide);
-      mqReduced.removeEventListener("change", decide);
-    };
-  }, []);
-
   // Header entrance timeline
   const { ref: revealRef, inView } = useInViewOnce<HTMLDivElement>(
     0.2,
@@ -116,7 +99,7 @@ export default function Process() {
         </div>
       </div>
 
-      {/* SR-only ordered list (always present, gives non-pinned content baseline) */}
+      {/* SR-only ordered list — the accessible baseline for the full content */}
       <ol className="sr-only">
         {PROCESS.map((step) => (
           <li key={step.id}>
@@ -126,222 +109,152 @@ export default function Process() {
         ))}
       </ol>
 
-      {/* Live region for active step */}
-      {mountMode === "pinned" && (
-        <span aria-live="polite" className="sr-only">
-          Step {activeIndex + 1} of {PROCESS.length}:{" "}
-          {PROCESS[activeIndex].title}.
-        </span>
-      )}
-
-      {mountMode === "pinned" && (
-        <DesktopPinned
-          activeIndex={activeIndex}
-          setActiveIndex={setActiveIndex}
-        />
-      )}
-
-      {mountMode === "stacked" && <MobileStacked />}
+      <ProcessCarousel />
     </section>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Desktop pinned variant
+// Carousel — self-contained, normal document flow, no scroll hijacking
 // ---------------------------------------------------------------------------
 
-interface DesktopPinnedProps {
-  activeIndex: number;
-  setActiveIndex: (i: number) => void;
-}
+function ProcessCarousel() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const reduced = useReducedMotion();
 
-function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const railRef = useRef<HTMLDivElement>(null);
-  const lastActiveIndexRef = useRef(0);
-  const progressFillRef = useRef<HTMLDivElement>(null);
-  const dotRefs = useRef<Array<HTMLSpanElement | null>>([]);
-  const labelRefs = useRef<Array<HTMLSpanElement | null>>([]);
-  // Live start/end (px) of the pinned ScrollTrigger range. Read on click to
-  // map a step index to its scroll position; updated automatically by GSAP on
-  // refresh/resize since we hold the same instance.
-  const triggerRef = useRef<{ start: number; end: number } | null>(null);
-  // True only while a click/keyboard-driven lenis.scrollTo is animating. While
-  // set, the ScrollTrigger snapTo no-ops so it cannot pull the position off the
-  // exact step target once the programmatic scroll settles. Organic (wheel/drag)
-  // scrolling never sets this, so snap behaves identically for the user.
-  const isProgrammaticScrollingRef = useRef(false);
-  const programmaticTimeoutRef = useRef<number | null>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [viewportW, setViewportW] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  // Measure the carousel viewport so slide offsets are exact pixels.
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+    const measure = () => setViewportW(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
-    setupGsap();
-    const wrapper = wrapperRef.current;
-    const rail = railRef.current;
-    if (!wrapper || !rail) return;
-
-    const ctx = gsap.context(() => {
-      const totalScroll = PROCESS.length * STEP_VH;
-
-      const tween = gsap.to(rail, {
-        x: () => -window.innerWidth * (PROCESS.length - 1),
-        ease: "none",
-        scrollTrigger: {
-          trigger: wrapper,
-          start: "top top",
-          end: () => `+=${totalScroll}vh`,
-          pin: true,
-          pinSpacing: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          snap: {
-            snapTo: (value) => {
-              // While a click/keyboard jump is animating, returning the incoming
-              // value unchanged means "snap to where we already are" = no
-              // correction, so the exact step target is never nudged. Organic
-              // scrolling leaves the flag false and snaps to the normal grid.
-              if (isProgrammaticScrollingRef.current) return value;
-              return Math.round(value * PROCESS.length) / PROCESS.length;
-            },
-            duration: { min: 0.2, max: 0.6 },
-            delay: 0.08,
-            ease: "power2.inOut",
-          },
-          onUpdate: (self) => {
-            const p = self.progress;
-            const i = Math.min(
-              PROCESS.length - 1,
-              Math.floor(p * PROCESS.length * 0.9999)
-            );
-
-            // setState only on boundary change
-            if (i !== lastActiveIndexRef.current) {
-              lastActiveIndexRef.current = i;
-              setActiveIndex(i);
-
-              // Imperative dot + label state — no React reconciliation
-              dotRefs.current.forEach((el, idx) => {
-                if (!el) return;
-                el.dataset.active = idx <= i ? "true" : "false";
-              });
-              labelRefs.current.forEach((el, idx) => {
-                if (!el) return;
-                el.dataset.active = idx <= i ? "true" : "false";
-              });
-            }
-
-            // Imperative width update
-            if (progressFillRef.current) {
-              progressFillRef.current.style.width = `${p * 100}%`;
-            }
-          },
-        },
-      });
-
-      // Hold the live ScrollTrigger so clicks can read its current start/end.
-      triggerRef.current = tween.scrollTrigger ?? null;
-
-      // Initialize step 0 as active
-      requestAnimationFrame(() => {
-        dotRefs.current.forEach((el, idx) => {
-          if (!el) return;
-          el.dataset.active = idx === 0 ? "true" : "false";
-        });
-        labelRefs.current.forEach((el, idx) => {
-          if (!el) return;
-          el.dataset.active = idx === 0 ? "true" : "false";
-        });
-      });
-
-      return () => {
-        triggerRef.current = null;
-        if (programmaticTimeoutRef.current !== null) {
-          window.clearTimeout(programmaticTimeoutRef.current);
-          programmaticTimeoutRef.current = null;
-        }
-        isProgrammaticScrollingRef.current = false;
-        tween.scrollTrigger?.kill();
-        tween.kill();
-      };
-    }, wrapper);
-
-    return () => ctx.revert();
-  }, [setActiveIndex]);
-
-  // Jump to a step by scrolling to the scrollY that corresponds to that step's
-  // progress point inside the pinned range. The scroll-scrub then drives the
-  // slide naturally — the pin/scrub/snap logic is untouched.
-  const handleStepClick = useCallback((i: number) => {
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-    const { start, end } = trigger;
-    const denom = Math.max(1, PROCESS.length - 1);
-    // Nudge fractions a hair inside the range so the first/last steps land just
-    // past the pin enter / before the pin exit rather than on the boundary.
-    const eps = 0.002;
-    const frac = Math.min(1 - eps, Math.max(eps, i / denom));
-    // Round to an integer pixel so the landing is exact and not re-rounded.
-    const targetY = Math.round(start + (end - start) * frac);
-
-    const lenis = window.__lenis;
-    if (lenis) {
-      const DURATION = 0.9;
-      // Neutralize ScrollTrigger snap for the whole programmatic animation so it
-      // cannot drift the position once lenis.scrollTo settles on the target.
-      isProgrammaticScrollingRef.current = true;
-      if (programmaticTimeoutRef.current !== null) {
-        window.clearTimeout(programmaticTimeoutRef.current);
-        programmaticTimeoutRef.current = null;
-      }
-      const release = () => {
-        isProgrammaticScrollingRef.current = false;
-        if (programmaticTimeoutRef.current !== null) {
-          window.clearTimeout(programmaticTimeoutRef.current);
-          programmaticTimeoutRef.current = null;
-        }
-      };
-      lenis.scrollTo(targetY, {
-        duration: DURATION,
-        lock: true,
-        easing: (t: number) => 1 - Math.pow(1 - t, 3),
-        onComplete: release,
-      });
-      // Safety net: clear the flag even if onComplete never fires (e.g. the
-      // animation is interrupted), keeping organic snap from staying disabled.
-      programmaticTimeoutRef.current = window.setTimeout(
-        release,
-        DURATION * 1000 + 150
-      );
-    } else {
-      window.scrollTo({ top: targetY, behavior: "smooth" });
-    }
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = () => setIsDesktop(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
+
+  // This section no longer pins, so the document height changed relative to
+  // the old layout — recompute every other ScrollTrigger's start/end after we
+  // settle, and again when this section unmounts.
+  useEffect(() => {
+    setupGsap();
+    const raf = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => {
+      cancelAnimationFrame(raf);
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+    };
+  }, []);
+
+  const slideW = isDesktop ? viewportW * DESKTOP_SLIDE_FRACTION : viewportW;
+  const x = useMotionValue(0);
+
+  const slideTransition = reduced
+    ? ({ duration: 0 } as const)
+    : ({ duration: 0.5, ease: "easeInOut" } as const);
+
+  // Keep the track in sync with the active index (and re-sync on resize).
+  useEffect(() => {
+    const controls = animate(x, -activeIndex * slideW, slideTransition);
+    return () => controls.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIndex, slideW, reduced]);
+
+  const goTo = useCallback((i: number) => {
+    setActiveIndex(Math.min(PROCESS.length - 1, Math.max(0, i)));
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (_: unknown, info: PanInfo) => {
+      const threshold = Math.max(48, slideW * 0.18);
+      let next = activeIndex;
+      if (info.offset.x < -threshold || info.velocity.x < -500) {
+        next = Math.min(PROCESS.length - 1, activeIndex + 1);
+      } else if (info.offset.x > threshold || info.velocity.x > 500) {
+        next = Math.max(0, activeIndex - 1);
+      }
+      if (next === activeIndex) {
+        // Index unchanged — settle the track back onto the current slide.
+        animate(x, -activeIndex * slideW, slideTransition);
+      } else {
+        setActiveIndex(next);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeIndex, slideW, reduced]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        goTo(activeIndex - 1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        goTo(activeIndex + 1);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        goTo(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        goTo(PROCESS.length - 1);
+      }
+    },
+    [activeIndex, goTo]
+  );
 
   return (
     <div
-      ref={wrapperRef}
-      aria-hidden
-      className="relative h-screen w-full overflow-hidden"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Manufacturing process steps"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      className="pb-24 outline-none focus-visible:ring-1 focus-visible:ring-royal/60 md:pb-28"
     >
-      {/* Top breathing room */}
-      <div className="h-14" />
+      {/* Live region for active step */}
+      <span aria-live="polite" className="sr-only">
+        Step {activeIndex + 1} of {PROCESS.length}:{" "}
+        {PROCESS[activeIndex].title}.
+      </span>
 
-      {/* Rail */}
-      <div className="relative h-[calc(100vh-3.5rem-3rem)] w-full overflow-hidden">
-        <div
-          ref={railRef}
-          className="flex h-full flex-nowrap will-change-transform"
-          style={{ width: `${PROCESS.length * 100}vw` }}
+      {/* Track viewport */}
+      <div ref={viewportRef} className="relative w-full overflow-hidden">
+        <motion.div
+          aria-hidden
+          className="flex w-full cursor-grab touch-pan-y select-none flex-nowrap items-stretch active:cursor-grabbing"
+          style={{ x }}
+          drag="x"
+          dragConstraints={{
+            left: -(PROCESS.length - 1) * slideW,
+            right: 0,
+          }}
+          dragElastic={0.08}
+          dragMomentum={false}
+          onDragEnd={handleDragEnd}
         >
           {PROCESS.map((step, i) => (
-            <ProcessStep
+            <motion.div
               key={step.id}
-              step={step}
-              isActive={i === activeIndex}
-              layout="pinned"
-            />
+              className="w-full flex-none"
+              animate={{ opacity: 1 }}
+              transition={slideTransition}
+            >
+              <ProcessStep step={step} isActive={i === activeIndex} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Decorative rail line */}
         <span
@@ -350,14 +263,24 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
         />
       </div>
 
-      {/* Bottom progress */}
-      <div className="flex h-12 items-center">
-        <ProcessProgress
-          activeIndex={activeIndex}
-          fillRef={progressFillRef}
-          dotRefs={dotRefs}
-          labelRefs={labelRefs}
-          onStepClick={handleStepClick}
+      {/* Controls: prev / progress / next */}
+      <div className="mx-auto mt-8 flex w-full max-w-[1440px] items-center gap-5 px-6 md:gap-8 md:px-10">
+        <ArrowButton
+          dir="prev"
+          disabled={activeIndex === 0}
+          onClick={() => goTo(activeIndex - 1)}
+        />
+        <div className="min-w-0 flex-1">
+          <ProcessProgress
+            activeIndex={activeIndex}
+            reduced={reduced}
+            onStepClick={goTo}
+          />
+        </div>
+        <ArrowButton
+          dir="next"
+          disabled={activeIndex === PROCESS.length - 1}
+          onClick={() => goTo(activeIndex + 1)}
         />
       </div>
     </div>
@@ -365,93 +288,33 @@ function DesktopPinned({ activeIndex, setActiveIndex }: DesktopPinnedProps) {
 }
 
 // ---------------------------------------------------------------------------
-// Mobile stacked variant
+// Arrow button
 // ---------------------------------------------------------------------------
 
-function MobileStacked() {
-  const listRef = useRef<HTMLOListElement>(null);
-  const [filledHeight, setFilledHeight] = useState(0);
-  const reduced = useRef(false);
-
-  useEffect(() => {
-    reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const list = listRef.current;
-    if (!list) return;
-
-    const compute = () => {
-      const items = Array.from(
-        list.querySelectorAll<HTMLLIElement>("[data-process-step]")
-      );
-      const activeItems = items.filter(
-        (el) => el.getAttribute("data-process-active") === "true"
-      );
-      if (activeItems.length === 0) {
-        setFilledHeight(0);
-        return;
-      }
-      if (reduced.current) {
-        const last = items[items.length - 1];
-        const top = list.getBoundingClientRect().top;
-        const lastBottom = last.getBoundingClientRect().bottom;
-        setFilledHeight(lastBottom - top);
-        return;
-      }
-      const last = activeItems[activeItems.length - 1];
-      const top = list.getBoundingClientRect().top;
-      const marker = last.querySelector("[aria-hidden]");
-      const refRect = (marker ?? last).getBoundingClientRect();
-      const targetY = (refRect.top + refRect.bottom) / 2 - top;
-      setFilledHeight(Math.max(0, targetY));
-    };
-
-    compute();
-    const mo = new MutationObserver(compute);
-    mo.observe(list, {
-      attributes: true,
-      subtree: true,
-      attributeFilter: ["data-process-active"],
-    });
-    window.addEventListener("resize", compute);
-    window.addEventListener("scroll", compute, { passive: true });
-    const t = window.setInterval(compute, 250);
-    return () => {
-      mo.disconnect();
-      window.removeEventListener("resize", compute);
-      window.removeEventListener("scroll", compute);
-      window.clearInterval(t);
-    };
-  }, []);
-
+function ArrowButton({
+  dir,
+  disabled,
+  onClick,
+}: {
+  dir: "prev" | "next";
+  disabled: boolean;
+  onClick: () => void;
+}) {
   return (
-    <div className="relative mx-auto max-w-[1440px] px-6 pb-28 md:px-10">
-      <ol ref={listRef} className="relative">
-        {/* Vertical track */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute top-0 bottom-0 w-px bg-mediumGray/15"
-          style={{ left: "1.5rem" }}
-        />
-        {/* Fill */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute top-0 w-px bg-royal"
-          style={{
-            left: "1.5rem",
-            height: `${filledHeight}px`,
-            boxShadow: "0 0 12px rgba(43,91,166,0.4)",
-            transition: "height 360ms cubic-bezier(0.22, 1, 0.36, 1)",
-          }}
-        />
-        {PROCESS.map((step) => (
-          <ProcessStep
-            key={step.id}
-            step={step}
-            isActive
-            layout="stacked"
-            total={PROCESS.length}
-          />
-        ))}
-      </ol>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={dir === "prev" ? "Previous step" : "Next step"}
+      className="flex h-11 w-11 flex-none items-center justify-center border border-royal/50 text-royalLight transition-colors duration-200 hover:border-royal hover:bg-royal hover:text-bone focus-visible:border-royal focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-royal disabled:cursor-default disabled:opacity-30 disabled:hover:border-royal/50 disabled:hover:bg-transparent disabled:hover:text-royalLight"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+        {dir === "prev" ? (
+          <path d="M10 2 4 8l6 6" stroke="currentColor" strokeWidth="1.5" />
+        ) : (
+          <path d="M6 2l6 6-6 6" stroke="currentColor" strokeWidth="1.5" />
+        )}
+      </svg>
+    </button>
   );
 }
