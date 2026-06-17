@@ -30,7 +30,7 @@ function validateFile(file: File): string | null {
     )}.`;
   }
   if (file.size > MAX_FILE_BYTES) {
-    return "File exceeds 25 MB.";
+    return "File exceeds 4 MB.";
   }
   return null;
 }
@@ -183,7 +183,7 @@ function EmptyState({
           className="font-body"
           style={{ fontSize: "11px", color: "rgba(192,197,206,0.5)" }}
         >
-          PDF · STEP · IGES · DWG · DXF · ZIP — up to 25 MB
+          PDF · STEP · IGES · DWG · DXF · ZIP — up to 4 MB
         </span>
       </div>
     </div>

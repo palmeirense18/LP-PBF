@@ -20,7 +20,9 @@ export const ALLOWED_FILE_EXTENSIONS = [
   ".zip",
 ] as const;
 
-export const MAX_FILE_BYTES = 25 * 1024 * 1024;
+// Capped at 4 MB: Vercel Serverless Functions reject request bodies over 4.5 MB,
+// so the upload must stay under that ceiling to reach /api/contact in production.
+export const MAX_FILE_BYTES = 4 * 1024 * 1024;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -64,7 +66,7 @@ export function validateContact(state: ContactFormState): ContactFormErrors {
         ", "
       )}.`;
     } else if (state.file.size > MAX_FILE_BYTES) {
-      errors.file = "File exceeds 25 MB.";
+      errors.file = "File exceeds 4 MB.";
     }
   }
 

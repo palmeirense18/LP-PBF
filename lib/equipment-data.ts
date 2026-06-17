@@ -34,7 +34,7 @@ export const EQUIPMENT: readonly Equipment[] = [
     alt: "Large enclosed vertical mill paired with an LNS automation cabinet.",
     specs: [
       { label: "Travel", value: '50" × 26" × 25"' },
-      { label: "Spindle", value: "18,000 RPM · HSK-A63" },
+      { label: "Spindle", value: "120,000 RPM" },
       { label: "Repeatability", value: '±0.0001"' },
       { label: "Automation", value: "LNS Quickload bar feed" },
       { label: "Coolant", value: "1,000 psi through-spindle" },
